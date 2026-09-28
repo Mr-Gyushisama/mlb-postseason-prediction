@@ -34,7 +34,7 @@ function renderLogin(){
   <section class="login-shell">
     <div class="login-wrap">
       <div class="brand">
-        <div class="brand-badge"><span class="brand-mark">⚾</span> 2026 POSTSEASON</div>
+        <div class="brand-badge"><span class="brand-mark">MLB</span> 2026 POSTSEASON</div>
         <h1><span>MLB</span>ポストシーズン<br>予想ゲーム</h1>
         <p>5人対戦プライベートゲーム</p>
       </div>
@@ -83,11 +83,11 @@ function pendingStatus(){
 }
 function shell(body){
   const pending=pendingStatus();
-  const nav=[["home","ホーム",pending.total],["games","試合",pending.games],["series","シリーズ",pending.series],["rank","順位",0],["pre","大会前",pending.pre],["admin","管理",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
+  const nav=[["home","ホーム","⌂",pending.total],["games","試合","⚾",pending.games],["series","シリーズ","◇",pending.series],["rank","順位","🏆",0],["pre","大会前","★",pending.pre],["admin","管理","⚙",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
   return `<div class="shell">
     <header class="topbar">
       <div class="topbar-row">
-        <div class="header-brand"><div class="header-mark">⚾</div><div><div class="eyebrow">MLB ポストシーズン予想ゲーム</div><h2>${esc(state.actor.display_name)}</h2></div></div>
+        <div class="header-brand"><div class="header-mark">MLB</div><div><div class="eyebrow">POSTSEASON PREDICTION 2026</div><h2>${esc(state.actor.display_name)}</h2></div></div>
         <div class="header-actions">
           ${pending.total?`<button class="header-notify" data-go="home" aria-label="未対応${pending.total}件">🔔<span>${pending.total>9?"9+":pending.total}</span></button>`:""}
           <button id="logout" class="btn ghost small">ログアウト</button>
@@ -95,7 +95,7 @@ function shell(body){
       </div>
     </header>
     <main class="content">${body}</main>
-    <nav class="nav">${nav.map(([k,l,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
+    <nav class="nav">${nav.map(([k,l,icon,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-icon">${icon}</span><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
     <div id="busy" class="loading-overlay hidden"><div class="loading-box"><div class="spinner"></div><div class="muted" style="margin-top:8px">更新中...</div></div></div>
   </div>`;
 }
@@ -176,9 +176,9 @@ function budgetCard(){
 
 function matchupBlock(away,home){
   return `<div class="matchup">
-    <div class="team-panel away"><div class="team-code">${esc(teamCode(away))}</div><div class="team-name">${esc(teamName(away))}</div></div>
-    <div class="vs">VS</div>
-    <div class="team-panel home"><div class="team-code">${esc(teamCode(home))}</div><div class="team-name">${esc(teamName(home))}</div></div>
+    <div class="team-panel away"><div class="team-side">AWAY</div><div class="team-name">${esc(teamName(away))}</div><div class="team-code">${esc(teamCode(away))}</div></div>
+    <div class="vs"><span>VS</span></div>
+    <div class="team-panel home"><div class="team-side">HOME</div><div class="team-name">${esc(teamName(home))}</div><div class="team-code">${esc(teamCode(home))}</div></div>
   </div>`;
 }
 
