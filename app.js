@@ -20,6 +20,12 @@ const teamName=v=>TEAM_NAMES[String(v||"").toUpperCase()]||String(v||"");
 const teamCode=v=>String(v||"").toUpperCase();
 const roundName=v=>ROUND_NAMES[v]||String(v||"");
 const teamOptions=(codes,selected="")=>'<option value="">選択してください</option>'+codes.map(c=>`<option value="${c}" ${selected===c?"selected":""}>${teamName(c)}</option>`).join("");
+function syncPreWsChoices(){
+  const al=document.getElementById("preAL"),nl=document.getElementById("preNL"),ws=document.getElementById("preWS");
+  if(!al||!nl||!ws)return;
+  const current=ws.value,choices=[al.value,nl.value].filter(Boolean);
+  ws.innerHTML=teamOptions(choices,choices.includes(current)?current:(choices[0]||""));
+}
 const jst=d=>new Date(d).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",month:"numeric",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"});
 const localInput=d=>{const dt=new Date(d);const j=new Date(dt.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));return new Date(j.getTime()-j.getTimezoneOffset()*60000).toISOString().slice(0,16)};
 const isLocked=(d,status="scheduled")=>new Date(d)<=new Date(state?.serverTime||Date.now())||status!=="scheduled";
