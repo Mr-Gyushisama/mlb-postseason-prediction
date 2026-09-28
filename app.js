@@ -495,6 +495,8 @@ function render(){
 }
 function num(id){const e=document.getElementById(id),v=e?.value?.trim?.()??"";return v===""?null:Number(v)}
 function val(id){return document.getElementById(id).value.trim()}
+function validNums(values,message){if(values.some(v=>v===null||!Number.isFinite(v))){alert(message);return false}return true}
+function isoVal(id){const v=document.getElementById(id)?.value?.trim?.()||"";if(!v)return null;const d=new Date(v);return Number.isNaN(d.getTime())?null:d.toISOString()}
 function successText(action){
   return ({
     saveGamePrediction:"試合予想を保存しました。",
@@ -516,19 +518,60 @@ async function mutate(action,payload,confirmText){
   try{setBusy(true);state=await api(action,payload);toastMessage=successText(action);render()}catch(e){alert(errorText(e));setBusy(false)}
 }
 function wireActions(){
-  document.querySelectorAll("[data-save-game]").forEach(b=>b.onclick=()=>{const id=b.dataset.saveGame;mutate("saveGamePrediction",{gameId:id,awayScore:num("aw_"+id),homeScore:num("ho_"+id),stake:num("st_"+id),boost:document.getElementById("bo_"+id).checked})});
-  document.querySelectorAll("[data-cancel-game]").forEach(b=>b.onclick=()=>{const id=b.dataset.cancelGame;mutate("deleteGamePrediction",{gameId:id},"この試合の予想を取り消します。配分ポイントとBOOSTは未使用に戻ります。よろしいですか？")});
-  document.querySelectorAll("[data-save-series]").forEach(b=>b.onclick=()=>{const id=b.dataset.saveSeries;mutate("saveSeriesPrediction",{seriesId:id,winnerTeam:val("sw_"+id),loserWins:num("sl_"+id),upset:document.getElementById("su_"+id).checked})});
-  const pre=document.getElementById("savePre");if(pre)pre.onclick=()=>mutate("savePrePrediction",{alChampion:val("preAL"),nlChampion:val("preNL"),wsChampion:val("preWS"),wsLoserWins:num("preLW")});
+  document.querySelectorAll("[data-save-game]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.saveGame,aw=num("aw_"+id),ho=num("ho_"+id),stake=num("st_"+id);
+    if(!validNums([aw,ho,stake],"予想スコアと配分Pをすべて入力してください。"))return;
+    if(aw===ho){alert("引き分けスコアは予想できません。");return}
+    mutate("saveGamePrediction",{gameId:id,awayScore:aw,homeScore:ho,stake,boost:document.getElementById("bo_"+id).checked});
+  });
+  document.querySelectorAll("[data-cancel-game]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.cancelGame;
+    mutate("deleteGamePrediction",{gameId:id},"この試合の予想を取り消します。配分ポイントとBOOSTは未使用に戻ります。よろしいですか？");
+  });
+  document.querySelectorAll("[data-save-series]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.saveSeries;
+    mutate("saveSeriesPrediction",{seriesId:id,winnerTeam:val("sw_"+id),loserWins:num("sl_"+id),upset:document.getElementById("su_"+id).checked});
+  });
+  const preAL=document.getElementById("preAL"),preNL=document.getElementById("preNL");
+  if(preAL)preAL.onchange=syncPreWsChoices;
+  if(preNL)preNL.onchange=syncPreWsChoices;
+  syncPreWsChoices();
+  const pre=document.getElementById("savePre");
+  if(pre)pre.onclick=()=>{
+    const al=val("preAL"),nl=val("preNL"),ws=val("preWS");
+    if(!al||!nl||!ws){alert("AL・NL・ワールドシリーズ優勝予想を選択してください。");return}
+    mutate("savePrePrediction",{alChampion:al,nlChampion:nl,wsChampion:ws,wsLoserWins:num("preLW")});
+  };
   if(state.actor.role!=="admin"||view!=="admin")return;
   document.getElementById("saveNames").onclick=()=>mutate("adminSetPlayers",{names:state.players.map(p=>val("nm_"+p.id))},"5名の表示名を変更します。よろしいですか？");
-  document.getElementById("savePin").onclick=()=>mutate("adminSetPin",{playerId:val("pinPlayer"),pin:val("newPin")},"PINを変更すると対象ユーザーは再ログインが必要です。続行しますか？");
-  document.querySelectorAll("[data-result]").forEach(b=>b.onclick=()=>{const id=b.dataset.result;mutate("adminSetGameResult",{gameId:id,awayScore:num("ra_"+id),homeScore:num("rh_"+id)},"この試合結果を確定し、自動採点します。よろしいですか？")});
+  document.getElementById("savePin").onclick=()=>{
+    const pin=val("newPin");
+    if(!/^\d{4}$/.test(pin)){alert("PINは4桁の数字で入力してください。");return}
+    mutate("adminSetPin",{playerId:val("pinPlayer"),pin},"PINを変更すると対象ユーザーは再ログインが必要です。続行しますか？");
+  };
+  document.querySelectorAll("[data-result]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.result,aw=num("ra_"+id),ho=num("rh_"+id);
+    if(!validNums([aw,ho],"アウェー・ホームの最終スコアを入力してください。"))return;
+    if(aw===ho){alert("引き分けスコアは確定できません。");return}
+    mutate("adminSetGameResult",{gameId:id,awayScore:aw,homeScore:ho},"この試合結果を確定し、自動採点します。よろしいですか？");
+  });
   document.querySelectorAll("[data-round]").forEach(b=>b.onclick=()=>mutate("adminSetRoundClosed",{round:b.dataset.round,closed:b.dataset.closed!=="true"},b.dataset.closed==="true"?"このラウンドを再開しますか？":"ラウンドを終了します。未使用最低枠は失効します。よろしいですか？"));
-  document.getElementById("savePreLock").onclick=()=>mutate("adminSetPreLock",{preLockAt:new Date(document.getElementById("preLock").value).toISOString()},"大会前予想の締切日時を変更しますか？");
+  document.getElementById("savePreLock").onclick=()=>{
+    const preLockAt=isoVal("preLock");
+    if(!preLockAt){alert("大会前予想の締切日時を入力してください。");return}
+    mutate("adminSetPreLock",{preLockAt},"大会前予想の締切日時を変更しますか？");
+  };
   document.getElementById("savePreResult").onclick=()=>mutate("adminSetPreResult",{alChampion:val("actualAL"),nlChampion:val("actualNL"),wsChampion:val("actualWS"),wsLoserWins:num("actualLW")},"大会前予想の最終結果を確定して採点します。よろしいですか？");
-  document.getElementById("saveSeriesAdmin").onclick=()=>mutate("adminUpsertSeries",{id:val("seriesId"),code:val("seriesCode"),league:val("seriesLeague"),round:val("seriesRound"),teamA:val("teamA"),teamB:val("teamB"),seedA:val("seedA")||null,seedB:val("seedB")||null,startsAt:new Date(document.getElementById("seriesStart").value).toISOString(),status:"scheduled"},"シリーズ情報を保存しますか？");
-  document.getElementById("saveGameAdmin").onclick=()=>mutate("adminUpsertGame",{id:val("gameId"),seriesId:val("gameSeriesId"),gameNo:num("gameNo"),awayTeam:val("gameAway"),homeTeam:val("gameHome"),startsAt:new Date(document.getElementById("gameStart").value).toISOString(),status:"scheduled"},"試合情報を保存しますか？");
+  document.getElementById("saveSeriesAdmin").onclick=()=>{
+    const startsAt=isoVal("seriesStart");
+    if(!startsAt){alert("シリーズ開始日時を入力してください。");return}
+    mutate("adminUpsertSeries",{id:val("seriesId"),code:val("seriesCode"),league:val("seriesLeague"),round:val("seriesRound"),teamA:val("teamA"),teamB:val("teamB"),seedA:val("seedA")||null,seedB:val("seedB")||null,startsAt,status:"scheduled"},"シリーズ情報を保存しますか？");
+  };
+  document.getElementById("saveGameAdmin").onclick=()=>{
+    const startsAt=isoVal("gameStart"),gameNo=num("gameNo");
+    if(!startsAt||gameNo===null){alert("試合番号と開始日時を入力してください。");return}
+    mutate("adminUpsertGame",{id:val("gameId"),seriesId:val("gameSeriesId"),gameNo,awayTeam:val("gameAway"),homeTeam:val("gameHome"),startsAt,status:"scheduled"},"試合情報を保存しますか？");
+  };
 }
 if(token)refresh();else renderLogin();
 setInterval(()=>{if(token&&!busy)refresh()},30000);
