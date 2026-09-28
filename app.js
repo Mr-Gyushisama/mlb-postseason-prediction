@@ -70,8 +70,20 @@ function renderLogin(){
 }
 async function refresh(){try{state=await api("state");render()}catch(e){logoutLocal()}}
 
+function pendingStatus(){
+  if(!state||state.actor.role!=="player")return {pre:0,series:0,games:0,total:0};
+  const now=new Date(state.serverTime||Date.now());
+  const mineGame=state.gamePredictions.filter(x=>x.actor_id===state.actor.id);
+  const mineSeries=state.seriesPredictions.filter(x=>x.actor_id===state.actor.id);
+  const minePre=state.prePredictions.find(x=>x.actor_id===state.actor.id);
+  const pre=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)>now&&!minePre?1:0;
+  const series=state.series.filter(s=>new Date(s.starts_at)>now&&s.status==="scheduled"&&!mineSeries.some(p=>p.series_id===s.id)).length;
+  const games=state.games.filter(g=>new Date(g.starts_at)>now&&g.status==="scheduled"&&!mineGame.some(p=>p.game_id===g.id)).length;
+  return {pre,series,games,total:pre+series+games};
+}
 function shell(body){
-  const nav=[["home","ホーム"],["games","試合"],["series","シリーズ"],["rank","順位"],["pre","大会前"],["admin","管理"]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
+  const pending=pendingStatus();
+  const nav=[["home","ホーム",pending.total],["games","試合",pending.games],["series","シリーズ",pending.series],["rank","順位",0],["pre","大会前",pending.pre],["admin","管理",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
   return `<div class="shell">
     <header class="topbar">
       <div class="topbar-row">
@@ -80,7 +92,7 @@ function shell(body){
       </div>
     </header>
     <main class="content">${body}</main>
-    <nav class="nav">${nav.map(([k,l])=>`<button data-view="${k}" class="${view===k?"active":""}">${l}</button>`).join("")}</nav>
+    <nav class="nav">${nav.map(([k,l,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
     <div id="busy" class="loading-overlay hidden"><div class="loading-box"><div class="spinner"></div><div class="muted" style="margin-top:8px">更新中...</div></div></div>
   </div>`;
 }
@@ -112,8 +124,13 @@ function homeView(){
   const seriesDone=openSeries.length-undoneSeries.length;
   const gameDone=openGames.length-undoneGames.length;
   const rank=state.ranking.findIndex(x=>x.player.id===state.actor.id);
+  const pendingCount=(preOpen&&!minePre?1:0)+undoneSeries.length+undoneGames.length;
+  const pendingText=pendingCount
+    ? `試合 ${undoneGames.length}件 ／ シリーズ ${undoneSeries.length}件 ／ 大会前 ${preOpen&&!minePre?1:0}件`
+    : "現在、未入力の予想はありません";
   return viewTitle("ホーム",state.actor.role==="admin"?"運営状況を確認して管理メニューへ進みます。":"ここを見れば、次に何をすればよいか分かります。")+
-  `<section class="next-card">
+  (state.actor.role==="player"?`<div class="pending-summary ${pendingCount?"has-pending":"all-done"}"><div><span class="pending-dot"></span><b>${pendingCount?"未対応 "+pendingCount+"件":"入力完了"}</b></div><small>${pendingText}</small></div>`:"")+
+  `<section class="next-card ${pendingCount?"needs-action":""}">
       <div class="next-badge">${next.icon} ${next.label}</div>
       <h2>${esc(next.title)}</h2>
       <p>${esc(next.desc)}</p>
@@ -166,8 +183,14 @@ function gamesView(){
   let out=viewTitle("試合予想","各試合のスコアと使うポイントを決めます。")+guideSteps(["予想スコアを入力","1〜10Pを配分","BOOSTを選んで保存"])+budgetCard();
   for(const g of state.games){
     const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status);
-    const pill=g.status==="final"?'<span class="pill final">試合終了</span>':lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>';
-    out+=`<section class="card">
+    let cardState="game-neutral",pill="";
+    if(g.status==="final"){cardState="game-final";pill='<span class="pill final">試合終了</span>'}
+    else if(state.actor.role!=="player"){cardState=lock?"game-locked":"game-neutral";pill=lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}
+    else if(p&&lock){cardState="game-predicted game-locked";pill='<span class="pill predicted">✓ 予想済・締切</span>'}
+    else if(p){cardState="game-predicted";pill='<span class="pill predicted">✓ 予想済</span>'}
+    else if(lock){cardState="game-missed";pill='<span class="pill missed">未予想で締切</span>'}
+    else{cardState="game-unpredicted";pill='<span class="pill pending">● 未予想</span>'}
+    out+=`<section class="card game-card ${cardState}">
       <div class="status-line"><div class="muted">${esc(roundName(s?.round))} 第${g.game_no}戦 · ${jst(g.starts_at)}</div>${pill}</div>
       ${matchupBlock(g.away_team,g.home_team)}
       ${g.status==="final"?`<div class="notice" style="text-align:center;font-weight:900">最終スコア　${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</div>`:""}
@@ -179,7 +202,7 @@ function gamesView(){
       </div>
       <div class="boost-row"><label class="boost"><input id="bo_${g.id}" type="checkbox" ${p?.boost?"checked":""} ${lock?"disabled":""}> BOOSTを使う</label><span class="tiny">各ラウンド1回のみ</span></div>
       ${lock?"":`<button class="btn danger" style="width:100%" data-save-game="${g.id}">✓ 予想を保存</button>`}
-      ${p?`<div class="notice" style="margin-top:8px">保存済み：${p.away_score}-${p.home_score} ／ ${p.stake}P${p.boost?" ／ BOOST":""}</div>`:""}
+      ${p?`<div class="prediction-saved"><span>✓ 予想済み</span><b>${p.away_score} - ${p.home_score} ／ ${p.stake}P${p.boost?" ／ BOOST":""}</b></div>`:(!lock?'<div class="prediction-needed">この試合はまだ予想していません</div>':"")}
       `:""}
     </section>`;
   }
