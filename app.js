@@ -27,7 +27,11 @@ function setBusy(v){busy=v;const e=document.getElementById("busy");if(e)e.classL
 async function api(action,payload={}){
   const res=await fetch(API,{method:"POST",headers:{"content-type":"application/json","x-session-token":token},body:JSON.stringify({action,payload})});
   let body={};try{body=await res.json()}catch{}
-  if(!res.ok)throw new Error(body.error||"通信エラー");
+  if(!res.ok){
+    const err=new Error(body.error||"通信エラー");
+    err.status=res.status;
+    throw err;
+  }
   return body;
 }
 function errorText(err){const t=String(err?.message||err||"エラーが発生しました");if(t==="unauthorized")return"ログインの有効期限が切れました。再度ログインしてください。";return t}
@@ -72,7 +76,24 @@ function renderLogin(){
     }catch(e){er.textContent=errorText(e)}
   };
 }
-async function refresh(){try{state=await api("state");render()}catch(e){logoutLocal()}}
+async function refresh(){
+  try{
+    state=await api("state");
+  }catch(e){
+    if(e?.status===401){logoutLocal();return}
+    console.error("State refresh failed",e);
+    const er=document.getElementById("loginError");
+    if(er)er.textContent=errorText(e);
+    return;
+  }
+  try{
+    render();
+  }catch(e){
+    console.error("Render failed",e);
+    app.innerHTML=`<section class="login-shell"><div class="login-wrap"><div class="login-card"><h2>画面表示でエラーが発生しました</h2><p class="pin-hint">ログイン状態は保持されています。ページを再読み込みしてください。</p><button id="retryRender" class="btn login-submit">再読み込み</button><div class="error">${esc(e?.message||"表示エラー")}</div></div></div></section>`;
+    document.getElementById("retryRender").onclick=()=>location.reload();
+  }
+}
 
 function renderSetup(){
   app.innerHTML=`
