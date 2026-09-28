@@ -12,10 +12,14 @@ const TEAM_NAMES={
   LAD:"ドジャース",SD:"パドレス",SF:"ジャイアンツ",ARI:"ダイヤモンドバックス",COL:"ロッキーズ"
 };
 const ROUND_NAMES={WCS:"ワイルドカード",DS:"地区シリーズ",LCS:"リーグ優勝決定シリーズ",WS:"ワールドシリーズ"};
+const AL_TEAMS=["NYY","BOS","TOR","BAL","TB","CLE","DET","MIN","CWS","KC","HOU","TEX","SEA","LAA","ATH"];
+const NL_TEAMS=["ATL","PHI","NYM","MIA","WSH","MIL","CHC","STL","CIN","PIT","LAD","SD","SF","ARI","COL"];
+const ALL_TEAMS=[...AL_TEAMS,...NL_TEAMS];
 const esc=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const teamName=v=>TEAM_NAMES[String(v||"").toUpperCase()]||String(v||"");
 const teamCode=v=>String(v||"").toUpperCase();
 const roundName=v=>ROUND_NAMES[v]||String(v||"");
+const teamOptions=(codes,selected="")=>'<option value="">選択してください</option>'+codes.map(c=>`<option value="${c}" ${selected===c?"selected":""}>${teamName(c)}</option>`).join("");
 const jst=d=>new Date(d).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",month:"numeric",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"});
 const localInput=d=>{const dt=new Date(d);const j=new Date(dt.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));return new Date(j.getTime()-j.getTimezoneOffset()*60000).toISOString().slice(0,16)};
 const isLocked=(d,status="scheduled")=>new Date(d)<=new Date(state?.serverTime||Date.now())||status!=="scheduled";
@@ -271,18 +275,17 @@ function rankView(){
 
 function preView(){
   const p=state.prePredictions.find(x=>x.actor_id===state.actor.id),lock=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime);
-  return viewTitle("大会前予想","ポストシーズン開始前に優勝チームを予想します。")+guideSteps(["AL・NL優勝を入力","WS優勝を入力","WS最終成績を選んで保存"])+
+  return viewTitle("大会前予想","ポストシーズン開始前に優勝チームを予想します。")+guideSteps(["AL・NL優勝","WS優勝","最終成績を保存"])+
   `<section class="card glow"><div class="section-title"><h3>優勝予想</h3>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
   <div class="muted">締切：${jst(state.config.pre_lock_at)}</div>
   ${state.actor.role==="player"?`
-  <label class="label">ア・リーグ優勝</label><input id="preAL" class="field" value="${esc(p?.al_champion||"")}" ${lock?"disabled":""} placeholder="例：NYY">
-  <label class="label">ナ・リーグ優勝</label><input id="preNL" class="field" value="${esc(p?.nl_champion||"")}" ${lock?"disabled":""} placeholder="例：LAD">
-  <label class="label">ワールドシリーズ優勝</label><input id="preWS" class="field" value="${esc(p?.ws_champion||"")}" ${lock?"disabled":""} placeholder="AL/NL優勝予想のどちらか">
+  <label class="label">ア・リーグ優勝</label><select id="preAL" class="field" ${lock?"disabled":""}>${teamOptions(AL_TEAMS,p?.al_champion||"")}</select>
+  <label class="label">ナ・リーグ優勝</label><select id="preNL" class="field" ${lock?"disabled":""}>${teamOptions(NL_TEAMS,p?.nl_champion||"")}</select>
+  <label class="label">ワールドシリーズ優勝</label><select id="preWS" class="field" ${lock?"disabled":""}>${teamOptions(ALL_TEAMS,p?.ws_champion||"")}</select>
   <label class="label">ワールドシリーズ最終成績</label><select id="preLW" class="field" ${lock?"disabled":""}>${[0,1,2,3].map(n=>`<option value="${n}" ${+p?.ws_loser_wins===n?"selected":""}>4-${n}</option>`).join("")}</select>
   ${lock?"":'<button id="savePre" class="btn danger" style="width:100%;margin-top:10px">✓ 大会前予想を保存</button>'}
   `:''}</section>`;
 }
-
 function adminView(){
   if(state.actor.role!=="admin")return "";
   const names=state.players.map(p=>`<label class="label">${esc(p.id.toUpperCase())}</label><input class="field" id="nm_${p.id}" value="${esc(p.display_name)}">`).join("");
