@@ -157,7 +157,7 @@ function pendingStatus(){
 }
 function shell(body){
   const pending=pendingStatus();
-  const nav=[["home","ホーム",pending.total],["games","試合",pending.games],["series","シリーズ",pending.series],["rank","順位",0],["pre","大会前",pending.pre],["admin","管理",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
+  const nav=[["home","ホーム",0],["games","試合",pending.games],["series","シリーズ",pending.series],["rank","順位",0],["pre","大会前",pending.pre],["admin","管理",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
   return `<div class="shell">
     <header class="topbar">
       <div class="topbar-row">
@@ -223,14 +223,14 @@ function homeView(){
         <div class="progress-item"><span>現在順位</span><b>${rank>=0?rank+1:"-" }位</b></div>
       </div>
     </section>
-    <section class="card">
-      <h3>遊び方はこの3ステップ</h3>
-      <div class="flow-list">
+    <details class="card home-help">
+      <summary>遊び方を見る</summary>
+      <div class="flow-list help-flow">
         <div class="flow-item"><span>1</span><div><b>大会前・シリーズを予想</b><small>締切前に勝者やシリーズ成績を登録</small></div></div>
         <div class="flow-item"><span>2</span><div><b>各試合のスコアとポイントを予想</b><small>1試合1〜10P。BOOSTは各ラウンド1回</small></div></div>
         <div class="flow-item"><span>3</span><div><b>結果後に順位表を確認</b><small>採点は自動。獲得ポイントで5人の順位が決定</small></div></div>
       </div>
-    </section>`:"");
+    </details>`:"");
 }
 
 function budgetCard(){
