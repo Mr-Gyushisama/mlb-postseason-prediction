@@ -1,7 +1,7 @@
 const API="https://lidgvyhsytwwfndsmeic.supabase.co/functions/v1/mlb-prediction";
 const app=document.getElementById("app");
 let token=localStorage.getItem("mlb_token")||"";
-let state=null,view="games",role="player",actorId="p1",busy=false;
+let state=null,view="home",role="player",actorId="p1",busy=false;
 
 const TEAM_NAMES={
   NYY:"ヤンキース",BOS:"レッドソックス",TOR:"ブルージェイズ",BAL:"オリオールズ",TB:"レイズ",
@@ -71,7 +71,7 @@ function renderLogin(){
 async function refresh(){try{state=await api("state");render()}catch(e){logoutLocal()}}
 
 function shell(body){
-  const nav=[["games","試合予想"],["series","シリーズ予想"],["rank","順位表"],["pre","大会前予想"],["admin","管理"]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
+  const nav=[["home","ホーム"],["games","試合"],["series","シリーズ"],["rank","順位"],["pre","大会前"],["admin","管理"]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
   return `<div class="shell">
     <header class="topbar">
       <div class="topbar-row">
@@ -85,6 +85,59 @@ function shell(body){
   </div>`;
 }
 function viewTitle(title,sub){return `<section class="view-title"><h1>${title}</h1><p>${sub}</p></section>`}
+function guideSteps(items){return `<div class="guide-steps">${items.map((x,i)=>`<div class="guide-step"><span>${i+1}</span><b>${x}</b></div>`).join("")}</div>`}
+
+function homeView(){
+  const now=new Date(state.serverTime||Date.now());
+  const mineGame=state.gamePredictions.filter(x=>x.actor_id===state.actor.id);
+  const mineSeries=state.seriesPredictions.filter(x=>x.actor_id===state.actor.id);
+  const minePre=state.prePredictions.find(x=>x.actor_id===state.actor.id);
+  const preOpen=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)>now;
+  const openSeries=state.series.filter(s=>new Date(s.starts_at)>now&&s.status==="scheduled");
+  const openGames=state.games.filter(g=>new Date(g.starts_at)>now&&g.status==="scheduled");
+  const undoneSeries=openSeries.filter(s=>!mineSeries.some(p=>p.series_id===s.id));
+  const undoneGames=openGames.filter(g=>!mineGame.some(p=>p.game_id===g.id));
+  let next={view:"rank",icon:"🏆",label:"予想入力は完了",title:"順位表を確認しよう",desc:"結果が確定すると自動でポイントと順位が更新されます。",button:"順位表を見る"};
+  if(state.actor.role==="admin"){
+    next={view:"admin",icon:"⚙",label:"管理者メニュー",title:"試合結果と日程を管理",desc:"結果確定・ラウンド管理・次ラウンドの試合登録を行えます。",button:"管理画面を開く"};
+  }else if(preOpen&&!minePre){
+    next={view:"pre",icon:"①",label:"最初にやること",title:"大会前予想を登録しよう",desc:"ア・リーグ、ナ・リーグ、ワールドシリーズの優勝予想を登録します。",button:"大会前予想へ"};
+  }else if(undoneSeries.length){
+    const s=undoneSeries[0];
+    next={view:"series",icon:"②",label:"次にやること",title:"シリーズ予想を入力しよう",desc:`${teamName(s.team_a)} vs ${teamName(s.team_b)} の勝者と最終成績を予想します。`,button:"シリーズ予想へ"};
+  }else if(undoneGames.length){
+    const g=undoneGames[0];
+    next={view:"games",icon:"③",label:"次にやること",title:"試合予想を入力しよう",desc:`${teamName(g.away_team)} vs ${teamName(g.home_team)} のスコアと配分ポイントを入力します。`,button:"試合予想へ"};
+  }
+  const seriesDone=openSeries.length-undoneSeries.length;
+  const gameDone=openGames.length-undoneGames.length;
+  const rank=state.ranking.findIndex(x=>x.player.id===state.actor.id);
+  return viewTitle("ホーム",state.actor.role==="admin"?"運営状況を確認して管理メニューへ進みます。":"ここを見れば、次に何をすればよいか分かります。")+
+  `<section class="next-card">
+      <div class="next-badge">${next.icon} ${next.label}</div>
+      <h2>${esc(next.title)}</h2>
+      <p>${esc(next.desc)}</p>
+      <button class="btn danger next-button" data-go="${next.view}">${next.button} →</button>
+    </section>`+
+  (state.actor.role==="player"?`
+    <section class="card">
+      <div class="section-title"><h3>あなたの進行状況</h3><span class="pill">残り ${state.budget?.available??"-"}P</span></div>
+      <div class="progress-grid">
+        <div class="progress-item ${minePre?"done":""}"><span>大会前予想</span><b>${minePre?"完了":"未入力"}</b></div>
+        <div class="progress-item ${openSeries.length&&seriesDone===openSeries.length?"done":""}"><span>シリーズ予想</span><b>${seriesDone}/${openSeries.length}</b></div>
+        <div class="progress-item ${openGames.length&&gameDone===openGames.length?"done":""}"><span>試合予想</span><b>${gameDone}/${openGames.length}</b></div>
+        <div class="progress-item"><span>現在順位</span><b>${rank>=0?rank+1:"-" }位</b></div>
+      </div>
+    </section>
+    <section class="card">
+      <h3>遊び方はこの3ステップ</h3>
+      <div class="flow-list">
+        <div class="flow-item"><span>1</span><div><b>大会前・シリーズを予想</b><small>締切前に勝者やシリーズ成績を登録</small></div></div>
+        <div class="flow-item"><span>2</span><div><b>各試合のスコアとポイントを予想</b><small>1試合1〜10P。BOOSTは各ラウンド1回</small></div></div>
+        <div class="flow-item"><span>3</span><div><b>結果後に順位表を確認</b><small>採点は自動。獲得ポイントで5人の順位が決定</small></div></div>
+      </div>
+    </section>`:"");
+}
 
 function budgetCard(){
   if(!state.budget)return"";
@@ -110,7 +163,7 @@ function matchupBlock(away,home){
 }
 
 function gamesView(){
-  let out=viewTitle("試合予想","各試合の勝敗とスコアを予想し、ポイントを配分しましょう。")+budgetCard();
+  let out=viewTitle("試合予想","各試合のスコアと使うポイントを決めます。")+guideSteps(["予想スコアを入力","1〜10Pを配分","BOOSTを選んで保存"])+budgetCard();
   for(const g of state.games){
     const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status);
     const pill=g.status==="final"?'<span class="pill final">試合終了</span>':lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>';
@@ -134,7 +187,7 @@ function gamesView(){
 }
 
 function seriesView(){
-  return viewTitle("シリーズ予想","シリーズ勝者と最終成績を予想。下位シード勝利ならアップセットボーナス。")+
+  return viewTitle("シリーズ予想","第1戦の開始前に、シリーズ全体の結果を予想します。")+guideSteps(["勝者を選ぶ","最終成績を選ぶ","必要ならアップセットを選んで保存"])+
   state.series.map(s=>{
     const p=state.seriesPredictions.find(x=>x.series_id===s.id&&x.actor_id===state.actor.id),lock=isLocked(s.starts_at,s.status),need=s.round==="WCS"?2:s.round==="DS"?3:4;
     return `<section class="card"><div class="status-line"><div class="muted">${esc(roundName(s.round))} · 締切 ${jst(s.starts_at)}</div>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
@@ -151,7 +204,7 @@ function seriesView(){
 }
 
 function rankView(){
-  return viewTitle("🏆 順位表","5人の頂点を目指して、最も多くのポイントを獲得しよう。")+
+  return viewTitle("🏆 順位表","試合結果が確定すると自動で採点され、順位が更新されます。")+
   `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>`
     <div class="rank-row rank-${i+1}">
       <div class="rank-no">${i+1}</div>
@@ -162,7 +215,7 @@ function rankView(){
 
 function preView(){
   const p=state.prePredictions.find(x=>x.actor_id===state.actor.id),lock=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime);
-  return viewTitle("大会前予想","リーグ優勝とワールドシリーズの行方を、大会前に予想します。")+
+  return viewTitle("大会前予想","ポストシーズン開始前に優勝チームを予想します。")+guideSteps(["AL・NL優勝を入力","WS優勝を入力","WS最終成績を選んで保存"])+
   `<section class="card glow"><div class="section-title"><h3>優勝予想</h3>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
   <div class="muted">締切：${jst(state.config.pre_lock_at)}</div>
   ${state.actor.role==="player"?`
@@ -203,10 +256,11 @@ function adminView(){
 }
 
 function render(){
-  const body=view==="games"?gamesView():view==="series"?seriesView():view==="rank"?rankView():view==="pre"?preView():adminView();
+  const body=view==="home"?homeView():view==="games"?gamesView():view==="series"?seriesView():view==="rank"?rankView():view==="pre"?preView():adminView();
   app.innerHTML=shell(body);
   document.getElementById("logout").onclick=async()=>{try{await api("logout")}catch{}logoutLocal()};
   document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;render()});
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{view=b.dataset.go;render()});
   wireActions();
 }
 function num(id){return Number(document.getElementById(id).value)}
