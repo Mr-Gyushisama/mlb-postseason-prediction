@@ -1069,3 +1069,372 @@ details.card summary{font-size:14px}
   .header-notify .notify-label{font-size:9px}
   .header-notify strong{min-width:20px;height:20px;font-size:9px}
 }
+
+
+/* =========================================================
+   LIGHT THEME v4 — approved bright mockup
+   ========================================================= */
+:root{
+  --bg:#f4f7fb;
+  --panel:#ffffff;
+  --panel2:#f8fbff;
+  --glass:rgba(255,255,255,.94);
+  --line:#dbe5f0;
+  --line-strong:#9cc6f5;
+  --text:#10233f;
+  --muted:#6f8196;
+  --blue:#1f7ae0;
+  --blue2:#0e57b7;
+  --red:#ef3154;
+  --red2:#c91b3c;
+  --gold:#c98b0d;
+  --green:#159b72;
+  --shadow:0 10px 30px rgba(26,55,90,.10);
+}
+html{background:var(--bg);color:var(--text)}
+body{
+  color:var(--text);
+  background:
+    radial-gradient(circle at 12% 5%,rgba(35,127,224,.08),transparent 26%),
+    radial-gradient(circle at 88% 7%,rgba(239,49,84,.06),transparent 24%),
+    linear-gradient(180deg,#f8fbff 0%,#f3f7fb 54%,#eef4f9 100%);
+}
+body:before{
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(21,55,92,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(21,55,92,.025) 1px,transparent 1px);
+  background-size:34px 34px;
+}
+body:after{
+  background:
+    radial-gradient(ellipse at 15% 5%,rgba(31,122,224,.08),transparent 26%),
+    radial-gradient(ellipse at 85% 5%,rgba(239,49,84,.07),transparent 26%);
+  opacity:1;
+}
+.boot-screen{color:var(--muted)}
+
+/* LOGIN */
+.login-shell{
+  background:
+    radial-gradient(circle at 15% 8%,rgba(31,122,224,.10),transparent 28%),
+    radial-gradient(circle at 88% 84%,rgba(239,49,84,.08),transparent 30%),
+    linear-gradient(180deg,#f9fbfe,#f1f6fb 60%,#eef4f9);
+}
+.login-shell:before{background:#2f8dff;opacity:.10;filter:blur(72px)}
+.login-shell:after{background:#ef3154;opacity:.08;filter:blur(72px)}
+.brand h1{color:#10233f;text-shadow:none}
+.brand h1 span{
+  background:linear-gradient(180deg,#15355e,#0d2140);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.brand p{color:#75879a}
+.brand-badge{
+  color:#193553;
+  background:#fff;
+  border-color:#d7e3ef;
+  box-shadow:0 8px 20px rgba(39,69,103,.08)
+}
+.login-card,.setup-card{
+  background:rgba(255,255,255,.96);
+  border-color:#d7e3ef;
+  box-shadow:0 18px 50px rgba(28,58,94,.12);
+}
+.login-card:before{background:linear-gradient(120deg,rgba(31,122,224,.03),transparent 30%,rgba(239,49,84,.02))}
+.role-switch{background:#f2f6fb;border-color:#d9e4ef}
+.btn.secondary{
+  background:#eef4fa;
+  color:#23415f;
+  border-color:#d5e1ec;
+}
+.btn.ghost{
+  background:#fff;
+  color:#274663;
+  border-color:#d6e1ec;
+  box-shadow:none;
+}
+.player-grid .btn.active{
+  background:linear-gradient(180deg,#2f8df0,#176fd0);
+  box-shadow:0 0 0 1px rgba(90,162,239,.5),0 8px 18px rgba(31,122,224,.18)
+}
+.field,select.field,.login-card .field,.setup-field{
+  background:#fff;
+  color:#10233f;
+  border-color:#cfdce9;
+  box-shadow:inset 0 1px 2px rgba(23,54,89,.04);
+}
+.field:focus{
+  border-color:#6aa9eb;
+  box-shadow:0 0 0 3px rgba(31,122,224,.10)
+}
+.pin-hint,.setup-hint,.label{color:#6e8195}
+.error{color:#d12f4d}
+
+/* HEADER */
+.topbar{
+  background:rgba(255,255,255,.94);
+  color:#10233f;
+  border-bottom:1px solid #dfe7f0;
+  box-shadow:0 8px 24px rgba(28,58,94,.07);
+}
+.eyebrow{color:#7f91a4}
+.topbar h2{color:#10233f}
+.header-mark{
+  color:#fff;
+  box-shadow:0 4px 10px rgba(39,67,99,.12)
+}
+.header-notify{
+  background:#fff5f7;
+  border-color:#f4c5cf;
+  box-shadow:none;
+}
+.header-notify svg{color:#e83b5c}
+.header-notify .notify-label{color:#c62f4a}
+.header-notify strong{box-shadow:none}
+.header-clear{
+  color:#147a5c;
+  border-color:#bfe8d8;
+  background:#eefaf5;
+}
+
+/* TYPOGRAPHY / CONTENT */
+.view-title h1{color:#10233f;text-shadow:none}
+.view-title p,.muted,.tiny{color:#72859a}
+.content{color:#10233f}
+
+/* CARDS */
+.card,.next-card,.progress-item,.status-count,.budget-box,.rank-row,.guide-step{
+  color:#10233f;
+  background:#fff;
+  border-color:#dbe5f0;
+  box-shadow:0 8px 22px rgba(30,58,92,.07);
+}
+.card:before{background:linear-gradient(90deg,transparent,rgba(31,122,224,.10),transparent)}
+.card.glow{
+  background:linear-gradient(180deg,#ffffff,#f8fbff);
+  border-color:#bdd8f5;
+  box-shadow:0 10px 28px rgba(31,122,224,.08)
+}
+.next-card{
+  background:
+    radial-gradient(circle at 90% 15%,rgba(239,49,84,.08),transparent 28%),
+    radial-gradient(circle at 10% 90%,rgba(31,122,224,.08),transparent 30%),
+    #fff;
+  border-color:#c9dff5;
+}
+.next-card.needs-action{
+  border-color:#f0b9c4;
+  box-shadow:0 10px 30px rgba(239,49,84,.07)
+}
+.next-badge{
+  background:#edf6ff;
+  border-color:#c8e1fb;
+  color:#216db9;
+}
+.next-card p{color:#6f8196}
+.progress-item{background:#fbfdff}
+.progress-item.done{background:#f0faf6;border-color:#c6eadc}
+.progress-item.done b{color:#168464}
+.flow-item{border-color:#e7edf4}
+.flow-item small{color:#7a8da1}
+.guide-step{
+  background:#fff;
+  border-color:#dbe5f0;
+  box-shadow:0 6px 16px rgba(28,58,94,.05)
+}
+.guide-step b{color:#163351}
+
+/* PENDING SUMMARY */
+.pending-summary{
+  background:#fff3f5;
+  border-color:#f3c2cc;
+}
+.pending-summary b{color:#c82f4b}
+.pending-summary small{color:#6d8095}
+.pending-summary.all-done{
+  background:#eefaf5;
+  border-color:#c5e8da;
+}
+.pending-summary.all-done b{color:#16795d}
+
+/* STATUS COUNTS */
+.status-count{
+  background:#fff;
+  border-color:#dbe5f0;
+}
+.status-count span{color:#74879b}
+.status-count.pending{background:#fff2f4;border-color:#f1bdc8}
+.status-count.pending b{color:#d73a59}
+.status-count.done{background:#eefaf6;border-color:#bfe6d7}
+.status-count.done b{color:#148866}
+
+/* BUDGET */
+.metric{color:#d59a17;text-shadow:none}
+.budget-box{
+  background:#fff;
+  border-color:#dbe5f0;
+}
+.budget-box b{color:#163351}
+.budget-box span{color:#778a9e}
+
+/* MATCHUPS */
+.team-panel{
+  box-shadow:none;
+  border-color:#d7e3ef;
+}
+.team-panel.away{
+  background:linear-gradient(155deg,#eef6ff,#dfeeff);
+}
+.team-panel.home{
+  background:linear-gradient(155deg,#fff0f3,#fde2e8);
+}
+.team-panel.away:after{background:radial-gradient(circle,rgba(31,122,224,.10),transparent 68%)}
+.team-panel.home:after{background:radial-gradient(circle,rgba(239,49,84,.10),transparent 68%)}
+.team-side{color:#71879e}
+.team-name{color:#15314e;text-shadow:none}
+.team-code{color:#7890a6}
+.vs{
+  background:#fff;
+  border-color:#d4e0ec;
+  box-shadow:0 4px 12px rgba(25,57,90,.06)
+}
+.vs span{color:#6d8195}
+
+/* SCOREBOARD */
+.score-grid{
+  background:#f7fafd;
+  border-color:#dfe7f0;
+}
+.score-grid .team{color:#5f7389}
+.score-grid .field{
+  background:#fff;
+  color:#132d48;
+  border-color:#cfdce9;
+  box-shadow:inset 0 1px 2px rgba(22,52,86,.04)
+}
+.score-grid>div:nth-child(2) .field{color:#c28708}
+
+/* GAME / SERIES STATES */
+.game-card.game-unpredicted,.series-card.series-unpredicted{
+  background:linear-gradient(180deg,#fff8f9,#ffffff 46%);
+  border-color:#f0b9c4;
+  box-shadow:0 8px 24px rgba(222,61,91,.06)
+}
+.game-card.game-predicted,.series-card.series-predicted{
+  background:linear-gradient(180deg,#f4fcf9,#ffffff 46%);
+  border-color:#bfe7d8;
+  box-shadow:0 8px 24px rgba(21,155,114,.05)
+}
+.game-card.game-missed,.series-card.series-missed{
+  background:#f6f7f9;
+  border-color:#d8dee6;
+}
+.game-card.game-final{
+  background:#f8fafc;
+  border-color:#dbe3ec;
+}
+.pill{background:#f2f6fa;color:#536b82;border-color:#d8e2ec}
+.pill.pending{background:#fff0f3;color:#cf3552;border-color:#f0bcc7;box-shadow:none}
+.pill.predicted{background:#eefaf6;color:#147b5d;border-color:#bfe6d7}
+.pill.lock{background:#f7eef0;color:#985264;border-color:#ead4da}
+.pill.live{background:#eff8ff;color:#2875b8;border-color:#cfe5f7}
+.pill.final{background:#eef2f6;color:#556b80}
+.pill.missed{background:#f1edef;color:#80616a;border-color:#ded2d6}
+.prediction-saved{
+  background:#eefaf6;
+  border-color:#c1e8da;
+}
+.prediction-saved span{color:#157a5d}
+.prediction-saved b{color:#18394f}
+.prediction-needed{
+  background:#fff3f5;
+  border-color:#f2c5ce;
+  color:#c93653;
+}
+
+/* RANKING */
+.rank-row{
+  background:#fff;
+  border-color:#dbe5f0;
+}
+.rank-row.rank-1{
+  background:linear-gradient(90deg,#fffaf0,#ffffff);
+  border-color:#e8c86c;
+  box-shadow:0 8px 22px rgba(201,139,13,.08)
+}
+.rank-row.rank-2{border-color:#d7e1eb}
+.rank-row.rank-3{border-color:#e7d0c2}
+.rank-no,.rank-score{color:#17324d}
+.rank-1 .rank-no,.rank-1 .rank-score{color:#b87908}
+.rank-meta{color:#74879b}
+
+/* NAV */
+.nav{
+  background:rgba(255,255,255,.96);
+  border-color:#d7e2ed;
+  box-shadow:0 14px 30px rgba(28,58,94,.14);
+}
+.nav button{color:#7a8da1}
+.nav button.active{
+  color:#135ea9;
+  background:linear-gradient(180deg,#eef6ff,#f9fcff)
+}
+.nav button.active:before{
+  background:#2f8df0;
+  box-shadow:none
+}
+.nav-icon{color:#7a8da1}
+.nav button.active .nav-icon{color:#176fc8}
+.nav-badge{border-color:#fff;box-shadow:none}
+
+/* BUTTONS */
+.btn{
+  background:linear-gradient(180deg,#2f8df0,#176fc8);
+  border-color:#1d70c8;
+  box-shadow:0 6px 14px rgba(31,122,224,.15)
+}
+.btn.danger{
+  background:linear-gradient(180deg,#f34b68,#df2949);
+  border-color:#dc2d4b;
+  box-shadow:0 6px 14px rgba(239,49,84,.14)
+}
+.cancel-prediction{
+  color:#c52d48 !important;
+  border-color:#efc3cc !important;
+  background:#fff7f8 !important;
+}
+
+/* ADMIN / DETAILS */
+details.card summary{color:#183651}
+.notice{
+  background:#eef6ff;
+  border-color:#cfe3f7;
+  color:#2f668e;
+}
+
+/* FIRST LOGIN SETUP */
+.setup-shell{
+  background:
+    radial-gradient(circle at 15% 8%,rgba(31,122,224,.09),transparent 28%),
+    radial-gradient(circle at 88% 85%,rgba(239,49,84,.07),transparent 30%),
+    linear-gradient(180deg,#f9fbfe,#f1f6fb 58%,#eef4f9);
+}
+.setup-shell:before{
+  background:
+    linear-gradient(rgba(20,55,90,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(20,55,90,.025) 1px,transparent 1px);
+}
+.setup-brand h1{color:#10233f}
+.setup-brand p{color:#75879a}
+.setup-step-label{
+  color:#1f6fb8;
+  background:#edf6ff;
+  border-color:#c8e2fb;
+}
+
+/* MOBILE */
+@media(max-width:560px){
+  body{background:#f4f7fb}
+  .topbar{background:rgba(255,255,255,.97)}
+  .card,.next-card{box-shadow:0 6px 18px rgba(28,58,94,.06)}
+}
