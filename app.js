@@ -367,7 +367,8 @@ function gamesView(){
       <div class="status-line"><div class="muted">${esc(roundName(s?.round))} 第${g.game_no}戦 · ${jst(g.starts_at)}</div>${pill}</div>
       ${matchupBlock(g.away_team,g.home_team)}
       ${g.status==="final"?`<div class="notice" style="text-align:center;font-weight:900">最終スコア　${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</div>`:""}
-      ${state.actor.role==="player"?`
+      ${g.status==="cancelled"?'<div class="notice cancelled-note">シリーズ決着により、この試合は開催されません。配分P・BOOSTは未使用へ戻ります。</div>':""}
+      ${state.actor.role==="player"&&g.status!=="cancelled"?`
       <div class="score-grid">
         <div><div class="team">${esc(teamName(g.away_team))}</div><input id="aw_${g.id}" class="field" type="number" min="0" max="30" value="${p?.away_score??""}" ${lock?"disabled":""}></div>
         <div><label class="label" style="text-align:center">配分P <span class="stake-limit">最大${stakeMax}</span></label><input id="st_${g.id}" class="field" type="number" min="1" max="${stakeMax}" value="${p?.stake??1}" ${lock?"disabled":""}></div>
