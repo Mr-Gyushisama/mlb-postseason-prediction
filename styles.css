@@ -2555,3 +2555,36 @@ body:before{
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }
+
+
+/* CANCELLED GAME SAFETY v1 — 2026-09-29 */
+.game-card.game-cancelled{
+  background:linear-gradient(180deg,rgba(244,247,250,.96),rgba(238,243,247,.96)) !important;
+  border-color:#d7e0e8 !important;
+  box-shadow:none !important;
+  opacity:.88;
+}
+.game-card.game-cancelled:after{
+  background:linear-gradient(90deg,#9aabba,#c9d4de) !important;
+}
+.pill.cancelled{
+  background:#e9eef3 !important;
+  border-color:#d4dee7 !important;
+  color:#5f7387 !important;
+}
+.cancelled-note{
+  text-align:center;
+  background:#f2f5f8 !important;
+  border-color:#d9e2ea !important;
+  color:#657a8e !important;
+}
+.result-row.is-cancelled{
+  background:linear-gradient(180deg,#f4f7f9,#eef3f6) !important;
+  border:1px solid #d8e1e9 !important;
+  opacity:.78;
+}
+.result-row button:disabled,
+.result-row input:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+}
