@@ -183,3 +183,64 @@ details[open].card summary:after{content:"−"}
   .next-card{padding:17px}
   .next-card h2{font-size:21px}
 }
+
+/* NOTIFICATION BADGES / PREDICTION STATUS */
+.nav-label{position:relative;z-index:1}
+.nav-badge{
+  position:absolute;top:8px;left:calc(50% + 12px);min-width:18px;height:18px;padding:0 5px;
+  border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,#ff4d68,#c80b35);
+  color:#fff;font-size:9px;font-weight:950;border:2px solid #06101f;
+  box-shadow:0 0 12px rgba(255,49,84,.55)
+}
+.pending-summary{
+  border-radius:13px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid rgba(255,69,98,.28);background:rgba(123,10,36,.18)
+}
+.pending-summary>div{display:flex;align-items:center;gap:7px}
+.pending-summary b{font-size:13px;color:#ff8da0}
+.pending-summary small{color:#a8bacb;font-size:10px;text-align:right}
+.pending-summary.all-done{border-color:rgba(45,212,160,.25);background:rgba(13,105,79,.15)}
+.pending-summary.all-done b{color:#62e3bb}
+.pending-dot{width:9px;height:9px;border-radius:50%;background:#ff3154;box-shadow:0 0 0 4px rgba(255,49,84,.12),0 0 14px rgba(255,49,84,.6);animation:notifyPulse 1.7s ease-in-out infinite}
+.all-done .pending-dot{background:#2dd4a0;box-shadow:0 0 12px rgba(45,212,160,.4);animation:none}
+@keyframes notifyPulse{50%{transform:scale(1.25);box-shadow:0 0 0 7px rgba(255,49,84,.06),0 0 18px rgba(255,49,84,.8)}}
+.next-card.needs-action{border-color:rgba(255,71,104,.45);box-shadow:0 0 30px rgba(255,34,79,.08),0 18px 38px rgba(0,0,0,.28)}
+
+.game-card{position:relative;transition:border-color .2s,box-shadow .2s,background .2s}
+.game-card.game-unpredicted{
+  border-color:rgba(255,54,91,.48);
+  background:linear-gradient(180deg,rgba(58,11,29,.82),rgba(14,16,31,.96));
+  box-shadow:0 0 25px rgba(255,26,74,.08),0 10px 24px rgba(0,0,0,.24)
+}
+.game-card.game-predicted{
+  border-color:rgba(45,212,160,.42);
+  background:linear-gradient(180deg,rgba(7,55,55,.82),rgba(6,21,34,.96));
+  box-shadow:0 0 24px rgba(45,212,160,.07),0 10px 24px rgba(0,0,0,.22)
+}
+.game-card.game-locked{opacity:.9}
+.game-card.game-missed{
+  border-color:rgba(150,84,99,.28);
+  background:linear-gradient(180deg,rgba(49,25,34,.64),rgba(13,17,27,.96))
+}
+.game-card.game-final{
+  border-color:rgba(133,154,178,.22);
+  background:linear-gradient(180deg,rgba(17,28,42,.85),rgba(8,15,25,.96))
+}
+.pill.predicted{background:rgba(24,135,104,.2);color:#64e4ba;border-color:rgba(45,212,160,.3)}
+.pill.pending{background:rgba(174,14,48,.22);color:#ff879a;border-color:rgba(255,57,95,.32)}
+.pill.missed{background:rgba(104,55,68,.28);color:#c7a4ad;border-color:rgba(151,98,112,.22)}
+.prediction-saved{
+  margin-top:9px;padding:10px 11px;border-radius:10px;background:rgba(18,119,91,.16);
+  border:1px solid rgba(45,212,160,.22);display:flex;align-items:center;justify-content:space-between;gap:8px
+}
+.prediction-saved span{color:#65e3bb;font-size:10px;font-weight:950}
+.prediction-saved b{font-size:12px;color:#e9fff8}
+.prediction-needed{
+  margin-top:9px;padding:9px 11px;border-radius:10px;background:rgba(151,13,45,.16);
+  border:1px solid rgba(255,54,91,.2);color:#ff8ba0;font-size:11px;font-weight:800;text-align:center
+}
+@media(max-width:560px){
+  .pending-summary{align-items:flex-start;flex-direction:column;gap:4px}
+  .pending-summary small{text-align:left}
+  .prediction-saved{align-items:flex-start;flex-direction:column;gap:3px}
+}
