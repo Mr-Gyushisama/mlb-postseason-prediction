@@ -492,7 +492,7 @@ function wireActions(){
   document.querySelectorAll("[data-cancel-game]").forEach(b=>b.onclick=()=>{const id=b.dataset.cancelGame;mutate("deleteGamePrediction",{gameId:id},"この試合の予想を取り消します。配分ポイントとBOOSTは未使用に戻ります。よろしいですか？")});
   document.querySelectorAll("[data-save-series]").forEach(b=>b.onclick=()=>{const id=b.dataset.saveSeries;mutate("saveSeriesPrediction",{seriesId:id,winnerTeam:val("sw_"+id),loserWins:num("sl_"+id),upset:document.getElementById("su_"+id).checked})});
   const pre=document.getElementById("savePre");if(pre)pre.onclick=()=>mutate("savePrePrediction",{alChampion:val("preAL"),nlChampion:val("preNL"),wsChampion:val("preWS"),wsLoserWins:num("preLW")});
-  if(state.actor.role!=="admin")return;
+  if(state.actor.role!=="admin"||view!=="admin")return;
   document.getElementById("saveNames").onclick=()=>mutate("adminSetPlayers",{names:state.players.map(p=>val("nm_"+p.id))},"5名の表示名を変更します。よろしいですか？");
   document.getElementById("savePin").onclick=()=>mutate("adminSetPin",{playerId:val("pinPlayer"),pin:val("newPin")},"PINを変更すると対象ユーザーは再ログインが必要です。続行しますか？");
   document.querySelectorAll("[data-result]").forEach(b=>b.onclick=()=>{const id=b.dataset.result;mutate("adminSetGameResult",{gameId:id,awayScore:num("ra_"+id),homeScore:num("rh_"+id)},"この試合結果を確定し、自動採点します。よろしいですか？")});
