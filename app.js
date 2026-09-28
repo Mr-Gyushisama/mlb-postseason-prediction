@@ -336,7 +336,7 @@ function matchupBlock(away,home){
 
 function gamesView(){
   const mine=state.gamePredictions.filter(x=>x.actor_id===state.actor.id);
-  const open=state.games.filter(g=>!isLocked(g.starts_at,g.status));
+  const open=state.games.filter(g=>g.status!=="cancelled"&&!isLocked(g.starts_at,g.status));
   const unpredicted=open.filter(g=>!mine.some(p=>p.game_id===g.id)).length;
   const predicted=open.length-unpredicted;
   const ordered=[...state.games].sort((a,b)=>{
@@ -351,6 +351,7 @@ function gamesView(){
     const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status),stakeMax=state.stakeMaxByRound?.[s?.round]??10;
     let cardState="game-neutral",pill="";
     if(g.status==="final"){cardState="game-final";pill='<span class="pill final">試合終了</span>'}
+    else if(g.status==="cancelled"){cardState="game-cancelled";pill='<span class="pill cancelled">開催なし</span>'}
     else if(state.actor.role!=="player"){cardState=lock?"game-locked":"game-neutral";pill=lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}
     else if(p&&lock){cardState="game-predicted game-locked";pill='<span class="pill predicted">✓ 予想済・締切</span>'}
     else if(p){cardState="game-predicted";pill='<span class="pill predicted">✓ 予想済</span>'}
@@ -486,7 +487,7 @@ function render(){
   const toast=document.getElementById("appToast");
   if(toast)setTimeout(()=>{toast.classList.add("hide");setTimeout(()=>{toastMessage=""},260)},2400);
 }
-function num(id){return Number(document.getElementById(id).value)}
+function num(id){const e=document.getElementById(id),v=e?.value?.trim?.()??"";return v===""?null:Number(v)}
 function val(id){return document.getElementById(id).value.trim()}
 function successText(action){
   return ({
