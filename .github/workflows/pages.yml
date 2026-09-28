@@ -38,3 +38,24 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify published site
+        shell: bash
+        run: |
+          PAGE_URL="${{ steps.deployment.outputs.page_url }}"
+          HTTP_CODE="$(curl -L --silent --show-error --retry 5 --retry-delay 2 --output /dev/null --write-out "%{http_code}" "$PAGE_URL")"
+          test "$HTTP_CODE" = "200"
+
+          for attempt in 1 2 3 4 5 6; do
+            CSS_OK=0
+            APP_OK=0
+            curl -L --fail --silent --show-error "${PAGE_URL}styles.css" | grep -F "MOBILE UX DENSITY v1" >/dev/null && CSS_OK=1 || true
+            curl -L --fail --silent --show-error "${PAGE_URL}app.js" | grep -F "遊び方を見る" >/dev/null && APP_OK=1 || true
+            if [ "$CSS_OK" = "1" ] && [ "$APP_OK" = "1" ]; then
+              exit 0
+            fi
+            sleep 3
+          done
+
+          echo "Published files did not match the current deployment."
+          exit 1
