@@ -27,6 +27,17 @@ jobs:
       - name: Check JavaScript syntax
         run: node --check app.js
 
+      - name: Build PWA raster icons
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq librsvg2-bin imagemagick
+          rsvg-convert -w 192 -h 192 icons/field-icon.svg -o icons/icon-192.png
+          rsvg-convert -w 512 -h 512 icons/field-icon.svg -o icons/icon-512.png
+          rsvg-convert -w 410 -h 410 icons/field-icon.svg -o /tmp/field-maskable-core.png
+          convert -size 512x512 xc:'#0f2744' /tmp/field-maskable-core.png -gravity center -composite icons/icon-512-maskable.png
+          identify icons/icon-192.png icons/icon-512.png icons/icon-512-maskable.png
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -57,7 +68,11 @@ jobs:
             curl -L --fail --silent --show-error "${PAGE_URL}manifest.webmanifest" | grep -F "field-icon.svg" >/dev/null && MANIFEST_OK=1 || true
             curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}icons/field-icon.svg" && ICON_OK=1 || true
             curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}apple-touch-icon.png" && TOUCH_OK=1 || true
-            if [ "$CSS_OK" = "1" ] && [ "$APP_OK" = "1" ] && [ "$MANIFEST_OK" = "1" ] && [ "$ICON_OK" = "1" ] && [ "$TOUCH_OK" = "1" ]; then
+            RASTER_OK=0
+            MASKABLE_OK=0
+            curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}icons/icon-192.png" && curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}icons/icon-512.png" && RASTER_OK=1 || true
+            curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}icons/icon-512-maskable.png" && MASKABLE_OK=1 || true
+            if [ "$CSS_OK" = "1" ] && [ "$APP_OK" = "1" ] && [ "$MANIFEST_OK" = "1" ] && [ "$ICON_OK" = "1" ] && [ "$TOUCH_OK" = "1" ] && [ "$RASTER_OK" = "1" ] && [ "$MASKABLE_OK" = "1" ]; then
               exit 0
             fi
             sleep 3
