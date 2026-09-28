@@ -230,7 +230,63 @@ function homeView(){
         <div class="flow-item"><span>2</span><div><b>各試合のスコアとポイントを予想</b><small>1試合1〜10P。BOOSTは各ラウンド1回</small></div></div>
         <div class="flow-item"><span>3</span><div><b>結果後に順位表を確認</b><small>採点は自動。獲得ポイントで5人の順位が決定</small></div></div>
       </div>
-    </details>`:"");
+    </details>
+    ${rulesBlock()}`:"");
+}
+
+function rulesBlock(){
+  const c=state.config||{},rm=c.round_multiplier||{},sp=c.series_points||{},pp=c.pre_points||{},mn=c.round_min||{};
+  const mult=v=>Number(v??0).toFixed(1).replace(/\.0$/,"");
+  const seriesLine=(label,key)=>`<div class="rule-score-row"><span>${label}</span><b>勝者 +${sp[key]?.winner??0}P</b><em>成績完全一致 +${sp[key]?.exact??0}P</em></div>`;
+  return `<details class="card rules-card">
+    <summary>ポイント・BOOSTルールを見る</summary>
+    <div class="rules-content">
+      <section class="rule-section">
+        <h4>試合予想の得点</h4>
+        <div class="multiplier-grid">
+          <div><span>WCS</span><b>×${mult(rm.WCS)}</b></div>
+          <div><span>DS</span><b>×${mult(rm.DS)}</b></div>
+          <div><span>LCS</span><b>×${mult(rm.LCS)}</b></div>
+          <div><span>WS</span><b>×${mult(rm.WS)}</b></div>
+        </div>
+        <div class="rule-list">
+          <div><b>勝敗的中</b><span>配分P × ラウンド倍率</span></div>
+          <div><b>片方の得点一致</b><span>さらに 配分P ×0.5 を加算</span></div>
+          <div><b>完全スコア一致</b><span>さらに 配分P を加算</span></div>
+          <div><b>勝敗を外した場合</b><span>0P</span></div>
+        </div>
+        <div class="rule-highlight boost-rule"><strong>BOOST</strong><span>上記で獲得した合計ポイントを <b>2倍</b>。各ラウンド1回だけ使用できます。</span></div>
+      </section>
+
+      <section class="rule-section">
+        <h4>シリーズ予想</h4>
+        <div class="rule-score-table">
+          ${seriesLine("WCS","WCS")}
+          ${seriesLine("DS","DS")}
+          ${seriesLine("LCS","LCS")}
+          ${seriesLine("WS","WS")}
+        </div>
+        <div class="rule-highlight upset-rule"><strong>UPSET</strong><span>下位シードの勝利を予想し、実際に勝てばシリーズ獲得ポイントを <b>1.5倍</b>。</span></div>
+      </section>
+
+      <section class="rule-section">
+        <h4>大会前予想</h4>
+        <div class="pre-rule-grid">
+          <div><span>AL優勝</span><b>+${pp.al??0}P</b></div>
+          <div><span>NL優勝</span><b>+${pp.nl??0}P</b></div>
+          <div><span>WS対戦カード一致</span><b>+${pp.matchup??0}P</b></div>
+          <div><span>WS優勝</span><b>+${pp.champion??0}P</b></div>
+          <div><span>WS最終成績一致</span><b>+${pp.exact??0}P</b></div>
+        </div>
+      </section>
+
+      <section class="rule-section rule-budget">
+        <h4>配分ポイント</h4>
+        <p>初期 <b>${c.initial_points??150}P</b>。1試合 <b>1〜10P</b>を配分します。最低使用枠は WCS ${mn.WCS??20}P ／ DS ${mn.DS??30}P ／ LCS ${mn.LCS??20}P ／ WS ${mn.WS??10}P、自由枠は <b>${c.free_points??70}P</b>です。</p>
+        <p>シリーズ予想・大会前予想では、この150Pは消費しません。試合予想を締切前に取り消した場合は、配分PとBOOSTが未使用へ戻ります。</p>
+      </section>
+    </div>
+  </details>`;
 }
 
 function budgetCard(){
