@@ -244,3 +244,41 @@ details[open].card summary:after{content:"−"}
   .pending-summary small{text-align:left}
   .prediction-saved{align-items:flex-start;flex-direction:column;gap:3px}
 }
+
+
+/* PRIORITY FLOW / HEADER ALERT */
+.header-actions{display:flex;align-items:center;gap:7px}
+.header-notify{
+  position:relative;width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,92,120,.28);
+  background:rgba(126,13,40,.2);color:#fff;font-size:17px
+}
+.header-notify span{
+  position:absolute;right:-4px;top:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:999px;
+  display:grid;place-items:center;background:#ff3154;color:#fff;border:2px solid #06101f;
+  font-size:9px;font-weight:950;box-shadow:0 0 12px rgba(255,49,84,.55)
+}
+.status-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.status-count{
+  border:1px solid rgba(107,156,207,.18);border-radius:11px;padding:9px;text-align:center;
+  background:rgba(7,22,40,.85)
+}
+.status-count span{display:block;font-size:9px;color:#879db2}
+.status-count b{display:block;font-size:20px;margin-top:2px}
+.status-count.pending{border-color:rgba(255,54,91,.34);background:rgba(116,11,38,.15)}
+.status-count.pending b{color:#ff7a91}
+.status-count.done{border-color:rgba(45,212,160,.28);background:rgba(14,92,70,.14)}
+.status-count.done b{color:#5fe0b8}
+.series-card{transition:border-color .2s,background .2s,box-shadow .2s}
+.series-card.series-unpredicted{
+  border-color:rgba(255,54,91,.45);
+  background:linear-gradient(180deg,rgba(57,11,28,.75),rgba(13,16,29,.96));
+  box-shadow:0 0 22px rgba(255,38,78,.06),0 10px 24px rgba(0,0,0,.22)
+}
+.series-card.series-predicted{
+  border-color:rgba(45,212,160,.38);
+  background:linear-gradient(180deg,rgba(8,57,51,.72),rgba(6,20,33,.96))
+}
+.series-card.series-missed{
+  border-color:rgba(145,83,99,.25);
+  background:linear-gradient(180deg,rgba(45,25,33,.6),rgba(13,17,27,.96))
+}
