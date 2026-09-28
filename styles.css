@@ -282,3 +282,521 @@ details[open].card summary:after{content:"−"}
   border-color:rgba(145,83,99,.25);
   background:linear-gradient(180deg,rgba(45,25,33,.6),rgba(13,17,27,.96))
 }
+
+
+/* =========================================================
+   APPROVED MOCKUP VISUAL SYSTEM v2
+   Stadium / premium sports game treatment
+   ========================================================= */
+:root{
+  --bg:#02060e;
+  --panel:#07111f;
+  --panel2:#0a1829;
+  --glass:rgba(7,17,31,.82);
+  --line:rgba(145,184,224,.20);
+  --line-strong:rgba(90,168,255,.48);
+  --text:#f8fbff;
+  --muted:#8498ad;
+  --blue:#218cff;
+  --blue2:#0751d8;
+  --red:#ff3158;
+  --red2:#b90031;
+  --gold:#ffd66d;
+  --green:#3de0b0;
+  --shadow:0 26px 70px rgba(0,0,0,.48);
+}
+html{background:#02060e}
+body{
+  position:relative;
+  overflow-x:hidden;
+  background:
+    radial-gradient(ellipse at 50% -10%,rgba(26,104,204,.30),transparent 33%),
+    radial-gradient(circle at 7% 13%,rgba(0,112,255,.18),transparent 24%),
+    radial-gradient(circle at 94% 17%,rgba(226,15,65,.16),transparent 26%),
+    linear-gradient(180deg,#02050c 0%,#06101e 48%,#02060e 100%);
+}
+body:before{
+  opacity:.16;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.2) 55%,transparent 85%)
+}
+body:after{
+  content:"";
+  position:fixed;
+  z-index:-1;
+  left:-8%;
+  right:-8%;
+  top:-70px;
+  height:250px;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at 10% 5%,rgba(255,255,255,.42) 0 1px,rgba(109,182,255,.25) 2px,transparent 24px),
+    radial-gradient(ellipse at 30% 0%,rgba(255,255,255,.40) 0 1px,rgba(109,182,255,.20) 2px,transparent 25px),
+    radial-gradient(ellipse at 70% 0%,rgba(255,255,255,.38) 0 1px,rgba(255,78,112,.17) 2px,transparent 24px),
+    radial-gradient(ellipse at 90% 5%,rgba(255,255,255,.40) 0 1px,rgba(255,78,112,.23) 2px,transparent 25px);
+  filter:blur(.2px);
+  opacity:.95
+}
+
+/* LOGIN — poster-like hero */
+.login-shell{
+  align-items:center;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.04),rgba(2,7,15,.66)),
+    radial-gradient(ellipse at 50% 11%,rgba(45,128,224,.24),transparent 34%);
+}
+.login-shell:before{
+  width:68vw;height:68vw;left:-30vw;top:-26vw;
+  background:#005eff;opacity:.28;filter:blur(70px)
+}
+.login-shell:after{
+  width:68vw;height:68vw;right:-32vw;bottom:-30vw;
+  background:#e30a43;opacity:.25;filter:blur(75px)
+}
+.login-wrap{width:min(520px,100%)}
+.brand{margin-bottom:28px}
+.brand-badge{
+  color:#d8e8f8;
+  padding:7px 14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+  border-color:rgba(168,199,232,.25);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 26px rgba(0,0,0,.24)
+}
+.brand-mark{
+  width:auto;min-width:36px;height:22px;padding:0 6px;
+  border-radius:5px;
+  background:linear-gradient(90deg,#075ac9,#075ac9 48%,#d91943 52%,#d91943);
+  font-size:9px;font-weight:950;letter-spacing:.02em
+}
+.brand h1{
+  font-size:clamp(38px,9vw,56px);
+  font-weight:950;
+  line-height:.94;
+  margin:18px 0 10px;
+  letter-spacing:-.055em;
+  text-shadow:0 3px 0 rgba(255,255,255,.04),0 16px 42px rgba(0,0,0,.55)
+}
+.brand h1 span{
+  font-size:.82em;
+  letter-spacing:.12em;
+  margin-bottom:6px;
+  background:linear-gradient(180deg,#fff,#b9d7f4);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.brand p{
+  color:#91a9c0;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.12em
+}
+.login-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:26px;
+  padding:20px;
+  background:
+    linear-gradient(180deg,rgba(18,40,66,.90),rgba(5,13,25,.96));
+  border:1px solid rgba(136,189,240,.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.11),
+    inset 0 -1px 0 rgba(0,0,0,.45),
+    0 28px 70px rgba(0,0,0,.52),
+    0 0 45px rgba(30,118,225,.08)
+}
+.login-card:before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(120deg,rgba(255,255,255,.06),transparent 22%,transparent 70%,rgba(255,49,88,.04))
+}
+.role-switch{background:#050d18;padding:4px;border-radius:14px;border:1px solid rgba(130,170,210,.13)}
+.role-switch .btn{border-radius:10px}
+.player-grid .btn{min-height:50px;border-radius:12px}
+.player-grid .btn.active{
+  background:linear-gradient(180deg,#1994ff,#0759da);
+  box-shadow:0 0 0 1px rgba(121,197,255,.65),0 0 24px rgba(30,140,255,.30),0 12px 20px rgba(0,0,0,.28)
+}
+.login-card .field{
+  height:54px;
+  border-radius:13px;
+  background:linear-gradient(180deg,#06101e,#040a13);
+  border-color:rgba(128,178,228,.28);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.35)
+}
+.login-submit{
+  height:54px;
+  border-radius:14px;
+  text-transform:none;
+  background:linear-gradient(180deg,#ff3d61 0%,#da0b3d 54%,#a9002a 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 0 30px rgba(255,30,76,.27),0 16px 26px rgba(0,0,0,.30)
+}
+
+/* APP FRAME */
+.shell{
+  max-width:780px;
+  padding-bottom:88px
+}
+.topbar{
+  min-height:67px;
+  padding:12px 14px;
+  background:
+    linear-gradient(180deg,rgba(4,10,20,.97),rgba(5,14,26,.91));
+  border-bottom:1px solid rgba(122,168,213,.17);
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
+}
+.header-mark{
+  width:40px;height:29px;border-radius:6px;
+  background:linear-gradient(90deg,#0759c7 0 48%,#d71943 52% 100%);
+  color:#fff;font-size:9px;letter-spacing:.02em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 6px 18px rgba(0,0,0,.28)
+}
+.header-brand{gap:10px}
+.header-brand h2{font-size:15px;font-weight:900}
+.eyebrow{font-size:8px;letter-spacing:.14em;color:#7890a8}
+.header-notify{
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(113,16,42,.32),rgba(45,7,20,.38));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 18px rgba(0,0,0,.20)
+}
+.content{padding:14px 12px 18px;gap:12px}
+.view-title{padding:5px 3px 2px}
+.view-title h1{
+  font-size:28px;
+  line-height:1;
+  letter-spacing:-.045em;
+  margin-bottom:8px;
+  text-shadow:0 8px 20px rgba(0,0,0,.34)
+}
+.view-title p{font-size:11px;line-height:1.5;color:#859bb0}
+
+/* PREMIUM GLASS / METAL CARD */
+.card{
+  position:relative;
+  overflow:hidden;
+  border-radius:18px;
+  padding:15px;
+  background:
+    linear-gradient(180deg,rgba(15,34,57,.90),rgba(5,15,28,.96));
+  border:1px solid rgba(136,178,218,.20);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 16px 32px rgba(0,0,0,.25)
+}
+.card:before{
+  content:"";position:absolute;left:0;right:0;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(190,222,255,.30),transparent);
+  pointer-events:none
+}
+.card.glow{
+  border-color:rgba(47,139,240,.36);
+  background:linear-gradient(180deg,rgba(13,43,77,.88),rgba(5,16,30,.96));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 30px rgba(0,115,255,.07),0 18px 36px rgba(0,0,0,.28)
+}
+.card h3{font-size:15px;letter-spacing:-.01em}
+
+/* HOME — main CTA like mock hero */
+.next-card{
+  border-radius:21px;
+  padding:20px;
+  background:
+    radial-gradient(circle at 92% 15%,rgba(255,58,96,.21),transparent 30%),
+    radial-gradient(circle at 10% 90%,rgba(24,133,255,.18),transparent 30%),
+    linear-gradient(135deg,rgba(14,48,88,.96),rgba(7,18,34,.98) 55%,rgba(51,8,27,.94));
+  border:1px solid rgba(89,164,238,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 35px rgba(10,112,255,.09),0 20px 42px rgba(0,0,0,.32)
+}
+.next-card.needs-action{
+  border-color:rgba(255,70,105,.48);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 35px rgba(255,28,74,.09),0 20px 42px rgba(0,0,0,.34)
+}
+.next-badge{
+  background:rgba(10,74,142,.32);
+  border-color:rgba(94,173,251,.30);
+  color:#a9d5ff;
+  letter-spacing:.04em
+}
+.next-card h2{font-size:25px;letter-spacing:-.035em}
+.next-button{height:50px;border-radius:13px}
+
+/* GUIDE / STATUS */
+.guide-steps{gap:7px}
+.guide-step{
+  min-height:60px;
+  background:linear-gradient(180deg,rgba(10,27,48,.92),rgba(5,15,27,.94));
+  border-color:rgba(112,157,205,.16);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+}
+.guide-step span{
+  background:linear-gradient(180deg,#2b9bff,#0754cb);
+  box-shadow:0 0 13px rgba(27,132,255,.23)
+}
+.status-summary{gap:7px}
+.status-count{
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(10,25,44,.94),rgba(5,15,28,.96));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+}
+.status-count b{font-size:22px}
+
+/* BUDGET — compact dashboard */
+.budget-head{align-items:center}
+.metric{
+  font-size:40px;
+  color:var(--gold);
+  text-shadow:0 0 22px rgba(255,198,60,.14)
+}
+.budget-row{gap:5px}
+.budget-box{
+  border-radius:11px;
+  padding:9px 3px;
+  background:linear-gradient(180deg,rgba(9,25,45,.97),rgba(5,14,25,.98));
+  border-color:rgba(105,154,205,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)
+}
+.budget-box b{font-size:17px}
+
+/* MATCHUP — strongest visual change */
+.matchup{
+  grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);
+  gap:8px;
+  margin:14px 0 15px
+}
+.team-panel{
+  position:relative;
+  min-height:112px;
+  overflow:hidden;
+  padding:13px 8px 12px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.09);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 25px rgba(0,0,0,.22)
+}
+.team-panel:after{
+  content:"";position:absolute;inset:auto -18% -58% -18%;height:95%;
+  border-radius:50%;opacity:.45;filter:blur(1px);pointer-events:none
+}
+.team-panel.away{
+  background:
+    linear-gradient(155deg,rgba(17,94,192,.53),rgba(5,25,50,.93) 65%),
+    #06162b
+}
+.team-panel.away:after{background:radial-gradient(circle,rgba(34,137,255,.45),transparent 66%)}
+.team-panel.home{
+  background:
+    linear-gradient(155deg,rgba(178,21,57,.43),rgba(49,6,23,.89) 66%),
+    #1b0710
+}
+.team-panel.home:after{background:radial-gradient(circle,rgba(255,45,85,.36),transparent 66%)}
+.team-side{
+  position:relative;z-index:1;
+  font-size:8px;font-weight:900;letter-spacing:.18em;
+  color:rgba(224,238,251,.58);
+  margin-bottom:9px
+}
+.team-name{
+  position:relative;z-index:1;
+  margin:0;
+  max-width:100%;
+  text-align:center;
+  font-size:clamp(14px,3.7vw,20px);
+  line-height:1.14;
+  font-weight:950;
+  letter-spacing:-.045em;
+  text-shadow:0 5px 15px rgba(0,0,0,.42)
+}
+.team-code{
+  position:relative;z-index:1;
+  margin-top:8px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.15em;
+  color:rgba(223,237,251,.55)
+}
+.vs{
+  position:relative;
+  z-index:1;
+  height:48px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:linear-gradient(180deg,#1a2d45,#07111f);
+  border:1px solid rgba(164,197,231,.23);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 8px 20px rgba(0,0,0,.28)
+}
+.vs span{font-size:10px;color:#afc1d2;font-weight:950;letter-spacing:.08em}
+
+/* SCOREBOARD INPUT */
+.score-grid{
+  grid-template-columns:1fr 86px 1fr;
+  gap:7px;
+  padding:10px;
+  border-radius:14px;
+  background:rgba(1,7,15,.46);
+  border:1px solid rgba(117,157,199,.12)
+}
+.score-grid .team{
+  color:#b7c9db;
+  font-size:10px;
+  margin-bottom:6px
+}
+.score-grid .field{
+  height:55px;
+  border-radius:10px;
+  font-size:24px;
+  background:linear-gradient(180deg,#030a12,#09131f);
+  border-color:rgba(150,188,226,.22);
+  box-shadow:inset 0 4px 12px rgba(0,0,0,.36);
+  font-variant-numeric:tabular-nums
+}
+.score-grid>div:nth-child(2) .field{
+  font-size:19px;
+  color:var(--gold)
+}
+.field,select.field{
+  background:linear-gradient(180deg,rgba(7,19,34,.98),rgba(4,12,22,.98));
+  border-color:rgba(116,163,211,.21);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),inset 0 3px 10px rgba(0,0,0,.16)
+}
+.field:focus{
+  border-color:#2e9dff;
+  box-shadow:0 0 0 3px rgba(30,138,255,.11),0 0 18px rgba(0,109,255,.08)
+}
+
+/* GAME / SERIES STATES retain semantics but look less flat */
+.game-card.game-unpredicted,.series-card.series-unpredicted{
+  border-color:rgba(255,63,98,.50);
+  background:
+    linear-gradient(180deg,rgba(58,10,28,.54),rgba(8,16,29,.96) 38%),
+    linear-gradient(135deg,rgba(255,44,83,.06),transparent 55%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 0 28px rgba(255,25,72,.06),0 16px 34px rgba(0,0,0,.26)
+}
+.game-card.game-predicted,.series-card.series-predicted{
+  border-color:rgba(48,216,173,.39);
+  background:
+    linear-gradient(180deg,rgba(8,57,52,.46),rgba(7,17,30,.96) 40%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 0 26px rgba(44,215,172,.05),0 16px 34px rgba(0,0,0,.25)
+}
+.pill{
+  letter-spacing:.02em;
+  backdrop-filter:blur(8px)
+}
+.pill.pending{
+  color:#ff9aab;
+  background:linear-gradient(180deg,rgba(177,16,50,.30),rgba(93,7,29,.28));
+  box-shadow:0 0 15px rgba(255,40,80,.08)
+}
+.pill.predicted{
+  color:#72eac5;
+  background:linear-gradient(180deg,rgba(17,130,97,.28),rgba(8,75,59,.27))
+}
+.prediction-saved{
+  border-radius:11px;
+  background:linear-gradient(180deg,rgba(20,121,93,.15),rgba(7,60,49,.13))
+}
+
+/* BUTTONS — metallic / broadcast graphic */
+.btn{
+  border-radius:11px;
+  background:linear-gradient(180deg,#2799ff 0%,#0968df 52%,#0647b8 100%);
+  border-color:rgba(133,201,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 10px 20px rgba(0,77,183,.16)
+}
+.btn.danger{
+  background:linear-gradient(180deg,#ff4567 0%,#dc0c40 54%,#a7002b 100%);
+  border-color:rgba(255,151,170,.15);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 22px rgba(255,36,79,.10),0 12px 22px rgba(0,0,0,.22)
+}
+.btn.ghost{
+  background:linear-gradient(180deg,rgba(24,40,59,.72),rgba(8,17,29,.72));
+  border-color:rgba(130,171,211,.15)
+}
+
+/* RANKING — podium energy */
+.rank-list{gap:9px}
+.rank-row{
+  min-height:67px;
+  border-radius:14px;
+  padding:12px 13px;
+  background:
+    linear-gradient(180deg,rgba(14,32,54,.92),rgba(6,17,30,.95));
+  border-color:rgba(120,161,204,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+}
+.rank-row.rank-1{
+  border-color:rgba(255,208,95,.50);
+  background:
+    radial-gradient(circle at 90% 50%,rgba(255,196,57,.10),transparent 35%),
+    linear-gradient(90deg,rgba(102,72,10,.38),rgba(13,31,51,.93));
+  box-shadow:inset 0 1px 0 rgba(255,241,188,.07),0 0 30px rgba(255,190,46,.08),0 13px 28px rgba(0,0,0,.24)
+}
+.rank-no{font-size:25px}
+.rank-score{font-size:22px;letter-spacing:-.03em}
+
+/* NAV — floating premium dock */
+.nav{
+  left:50%;
+  bottom:8px;
+  width:min(740px,calc(100% - 16px));
+  height:66px;
+  border-radius:18px;
+  border:1px solid rgba(118,162,205,.18);
+  background:linear-gradient(180deg,rgba(8,20,35,.96),rgba(3,9,17,.97));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 18px 42px rgba(0,0,0,.48);
+  overflow:visible
+}
+.nav button{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  min-width:0;
+  border-radius:14px;
+  transition:.16s ease
+}
+.nav button.active{
+  color:#f4f9ff;
+  background:linear-gradient(180deg,rgba(26,105,192,.16),rgba(7,38,78,.13))
+}
+.nav button.active:before{
+  top:-1px;
+  left:28%;right:28%;
+  height:2px;
+  background:#3ca2ff;
+  box-shadow:0 0 14px rgba(40,147,255,.75)
+}
+.nav-icon{
+  display:block;
+  height:18px;
+  line-height:18px;
+  font-size:15px;
+  filter:saturate(.8)
+}
+.nav-label{font-size:9px;letter-spacing:.02em}
+.nav-badge{top:5px;left:calc(50% + 10px)}
+
+/* ADMIN remains readable in same system */
+details.card summary{font-size:14px}
+
+/* MOBILE FIDELITY */
+@media(max-width:560px){
+  .shell{padding-bottom:86px}
+  .content{padding:12px 10px 16px}
+  .topbar{padding-left:10px;padding-right:10px}
+  .topbar .btn.small{font-size:10px;padding:7px 8px;min-height:34px}
+  .header-notify{width:34px;height:34px;font-size:15px}
+  .view-title h1{font-size:26px}
+  .card{border-radius:16px;padding:12px}
+  .next-card{padding:17px}
+  .matchup{grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr);gap:5px}
+  .team-panel{min-height:104px;padding:12px 5px}
+  .team-name{font-size:clamp(13px,4vw,18px)}
+  .vs{height:38px}
+  .score-grid{grid-template-columns:1fr 74px 1fr;padding:8px 7px;gap:5px}
+  .score-grid .field{height:50px;font-size:22px;padding:0 6px}
+  .budget-row{gap:3px}
+  .budget-box{padding:8px 1px}
+  .nav{bottom:6px;width:calc(100% - 12px);height:64px;border-radius:17px}
+  .nav button{font-size:8px}
+  .nav-icon{font-size:14px}
+}
