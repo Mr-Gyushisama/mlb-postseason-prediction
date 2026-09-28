@@ -88,7 +88,10 @@ function shell(body){
     <header class="topbar">
       <div class="topbar-row">
         <div class="header-brand"><div class="header-mark">⚾</div><div><div class="eyebrow">MLB ポストシーズン予想ゲーム</div><h2>${esc(state.actor.display_name)}</h2></div></div>
-        <button id="logout" class="btn ghost small">ログアウト</button>
+        <div class="header-actions">
+          ${pending.total?`<button class="header-notify" data-go="home" aria-label="未対応${pending.total}件">🔔<span>${pending.total>9?"9+":pending.total}</span></button>`:""}
+          <button id="logout" class="btn ghost small">ログアウト</button>
+        </div>
       </div>
     </header>
     <main class="content">${body}</main>
@@ -180,8 +183,19 @@ function matchupBlock(away,home){
 }
 
 function gamesView(){
-  let out=viewTitle("試合予想","各試合のスコアと使うポイントを決めます。")+guideSteps(["予想スコアを入力","1〜10Pを配分","BOOSTを選んで保存"])+budgetCard();
-  for(const g of state.games){
+  const mine=state.gamePredictions.filter(x=>x.actor_id===state.actor.id);
+  const open=state.games.filter(g=>!isLocked(g.starts_at,g.status));
+  const unpredicted=open.filter(g=>!mine.some(p=>p.game_id===g.id)).length;
+  const predicted=open.length-unpredicted;
+  const ordered=[...state.games].sort((a,b)=>{
+    const pa=mine.some(p=>p.game_id===a.id),pb=mine.some(p=>p.game_id===b.id);
+    const la=isLocked(a.starts_at,a.status),lb=isLocked(b.starts_at,b.status);
+    const wa=!la&&!pa?0:!la&&pa?1:2;
+    const wb=!lb&&!pb?0:!lb&&pb?1:2;
+    return wa-wb||new Date(a.starts_at)-new Date(b.starts_at);
+  });
+  let out=viewTitle("試合予想","未予想の試合を上に表示しています。")+guideSteps(["予想スコアを入力","1〜10Pを配分","BOOSTを選んで保存"])+(state.actor.role==="player"?`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>${predicted}</b></div><div class="status-count"><span>受付中</span><b>${open.length}</b></div></div>`:"")+budgetCard();
+  for(const g of ordered){
     const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status);
     let cardState="game-neutral",pill="";
     if(g.status==="final"){cardState="game-final";pill='<span class="pill final">試合終了</span>'}
