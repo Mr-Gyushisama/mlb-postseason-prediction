@@ -344,7 +344,7 @@ function gamesView(){
         <div><label class="label" style="text-align:center">配分P</label><input id="st_${g.id}" class="field" type="number" min="1" max="10" value="${p?.stake??1}" ${lock?"disabled":""}></div>
         <div><div class="team">${esc(teamName(g.home_team))}</div><input id="ho_${g.id}" class="field" type="number" min="0" max="30" value="${p?.home_score??""}" ${lock?"disabled":""}></div>
       </div>
-      <div class="boost-row"><label class="boost"><input id="bo_${g.id}" type="checkbox" ${p?.boost?"checked":""} ${lock?"disabled":""}> BOOSTを使う</label><span class="tiny">各ラウンド1回のみ</span></div>
+      <div class="boost-row"><label class="boost"><input id="bo_${g.id}" type="checkbox" ${p?.boost?"checked":""} ${lock?"disabled":""}> BOOSTを使う</label><span class="tiny">各ラウンド1回・獲得P×2</span></div>
       ${lock?"":p?`<div class="prediction-actions"><button class="btn" data-save-game="${g.id}">予想を更新</button><button class="btn ghost cancel-prediction" data-cancel-game="${g.id}">予想を取消</button></div>`:`<button class="btn danger" style="width:100%" data-save-game="${g.id}">✓ 予想を保存</button>`}
       ${p?`<div class="prediction-saved"><span>✓ 予想済み</span><b>${p.away_score} - ${p.home_score} ／ ${p.stake}P${p.boost?" ／ BOOST":""}</b></div>`:(!lock?'<div class="prediction-needed">この試合はまだ予想していません</div>':"")}
       `:""}
