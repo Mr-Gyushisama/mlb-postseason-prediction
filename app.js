@@ -224,22 +224,41 @@ function gamesView(){
 }
 
 function seriesView(){
-  return viewTitle("シリーズ予想","第1戦の開始前に、シリーズ全体の結果を予想します。")+guideSteps(["勝者を選ぶ","最終成績を選ぶ","必要ならアップセットを選んで保存"])+
-  state.series.map(s=>{
+  const mine=state.seriesPredictions.filter(x=>x.actor_id===state.actor.id);
+  const open=state.series.filter(s=>!isLocked(s.starts_at,s.status));
+  const unpredicted=open.filter(s=>!mine.some(p=>p.series_id===s.id)).length;
+  const predicted=open.length-unpredicted;
+  const ordered=[...state.series].sort((a,b)=>{
+    const pa=mine.some(p=>p.series_id===a.id),pb=mine.some(p=>p.series_id===b.id);
+    const la=isLocked(a.starts_at,a.status),lb=isLocked(b.starts_at,b.status);
+    const wa=!la&&!pa?0:!la&&pa?1:2;
+    const wb=!lb&&!pb?0:!lb&&pb?1:2;
+    return wa-wb||new Date(a.starts_at)-new Date(b.starts_at);
+  });
+  return viewTitle("シリーズ予想","未予想のシリーズを上に表示しています。")+
+  guideSteps(["勝者を選ぶ","最終成績を選ぶ","必要ならアップセットを選んで保存"])+
+  (state.actor.role==="player"?\`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>\${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>\${predicted}</b></div><div class="status-count"><span>受付中</span><b>\${open.length}</b></div></div>\`:"")+
+  ordered.map(s=>{
     const p=state.seriesPredictions.find(x=>x.series_id===s.id&&x.actor_id===state.actor.id),lock=isLocked(s.starts_at,s.status),need=s.round==="WCS"?2:s.round==="DS"?3:4;
-    return `<section class="card"><div class="status-line"><div class="muted">${esc(roundName(s.round))} · 締切 ${jst(s.starts_at)}</div>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
-      ${matchupBlock(s.team_a,s.team_b)}
-      ${s.status==="final"?`<div class="notice">${esc(teamName(s.winner_team))} 勝利 · ${s.wins_a}-${s.wins_b}</div>`:""}
-      ${state.actor.role==="player"?`
-        <label class="label">シリーズ勝者</label><select id="sw_${s.id}" class="field" ${lock?"disabled":""}><option value="${esc(s.team_a)}" ${p?.winner_team===s.team_a?"selected":""}>${esc(teamName(s.team_a))}</option><option value="${esc(s.team_b)}" ${p?.winner_team===s.team_b?"selected":""}>${esc(teamName(s.team_b))}</option></select>
-        <label class="label">シリーズ最終成績</label><select id="sl_${s.id}" class="field" ${lock?"disabled":""}>${Array.from({length:need},(_,n)=>`<option value="${n}" ${+p?.loser_wins===n?"selected":""}>${need}-${n}</option>`).join("")}</select>
-        <div class="boost-row"><label><input id="su_${s.id}" type="checkbox" ${p?.upset?"checked":""} ${lock?"disabled":""}> アップセット予想</label><span class="tiny">下位シード勝利で×1.5</span></div>
-        ${lock?"":`<button class="btn danger" style="width:100%" data-save-series="${s.id}">✓ シリーズ予想を保存</button>`}
-      `:""}
-    </section>`
+    let cls="series-card",seriesPill=lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>';
+    if(state.actor.role==="player"){
+      if(p&&!lock){cls+=" series-predicted";seriesPill='<span class="pill predicted">✓ 予想済</span>'}
+      else if(!p&&!lock){cls+=" series-unpredicted";seriesPill='<span class="pill pending">● 未予想</span>'}
+      else if(!p&&lock){cls+=" series-missed";seriesPill='<span class="pill missed">未予想で締切</span>'}
+    }
+    return \`<section class="card \${cls}"><div class="status-line"><div class="muted">\${esc(roundName(s.round))} · 締切 \${jst(s.starts_at)}</div>\${seriesPill}</div>
+      \${matchupBlock(s.team_a,s.team_b)}
+      \${s.status==="final"?\`<div class="notice">\${esc(teamName(s.winner_team))} 勝利 · \${s.wins_a}-\${s.wins_b}</div>\`:""}
+      \${state.actor.role==="player"?\`
+        <label class="label">シリーズ勝者</label><select id="sw_\${s.id}" class="field" \${lock?"disabled":""}><option value="\${esc(s.team_a)}" \${p?.winner_team===s.team_a?"selected":""}>\${esc(teamName(s.team_a))}</option><option value="\${esc(s.team_b)}" \${p?.winner_team===s.team_b?"selected":""}>\${esc(teamName(s.team_b))}</option></select>
+        <label class="label">シリーズ最終成績</label><select id="sl_\${s.id}" class="field" \${lock?"disabled":""}>\${Array.from({length:need},(_,n)=>\`<option value="\${n}" \${+p?.loser_wins===n?"selected":""}>\${need}-\${n}</option>\`).join("")}</select>
+        <div class="boost-row"><label><input id="su_\${s.id}" type="checkbox" \${p?.upset?"checked":""} \${lock?"disabled":""}> アップセット予想</label><span class="tiny">下位シード勝利で×1.5</span></div>
+        \${lock?"":\`<button class="btn danger" style="width:100%" data-save-series="\${s.id}">✓ シリーズ予想を保存</button>\`}
+        \${p?\`<div class="prediction-saved"><span>✓ シリーズ予想済み</span><b>\${esc(teamName(p.winner_team))} ／ \${need}-\${p.loser_wins}</b></div>\`:(!lock?'<div class="prediction-needed">このシリーズはまだ予想していません</div>':"")}
+      \`:""}
+    </section>\`
   }).join("");
 }
-
 function rankView(){
   return viewTitle("🏆 順位表","試合結果が確定すると自動で採点され、順位が更新されます。")+
   `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>`
