@@ -800,3 +800,117 @@ details.card summary{font-size:14px}
   .nav button{font-size:8px}
   .nav-icon{font-size:14px}
 }
+
+
+/* SCREENSHOT REFINEMENT v3 */
+.shell{
+  padding-bottom:150px;
+}
+.guide-steps{
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:7px;
+}
+.guide-step{
+  min-height:74px !important;
+  padding:10px 7px !important;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:7px;
+}
+.guide-step span{
+  flex:0 0 26px;
+  width:26px;
+  height:26px;
+}
+.guide-step b{
+  font-size:10px;
+  line-height:1.4;
+}
+.nav{
+  height:58px;
+  bottom:6px;
+  border-radius:16px;
+}
+.nav button{
+  gap:1px;
+}
+.nav-icon{
+  height:16px;
+  line-height:16px;
+  font-size:13px;
+}
+.nav-label{
+  font-size:8px;
+}
+.nav-badge{
+  top:2px;
+}
+.content{
+  padding-bottom:24px;
+}
+.view-title{
+  padding-top:2px;
+}
+.view-title h1{
+  font-size:25px;
+}
+.next-card{
+  padding:16px;
+}
+.next-card h2{
+  font-size:22px;
+  margin-top:10px;
+}
+.next-card p{
+  margin-bottom:11px;
+}
+.next-button{
+  height:46px;
+}
+.progress-grid{
+  gap:6px;
+}
+.progress-item{
+  padding:9px 10px;
+}
+.flow-item{
+  padding:7px 0;
+}
+.status-summary{
+  gap:6px;
+}
+.status-count{
+  padding:8px 6px;
+}
+.status-count b{
+  font-size:20px;
+}
+.card{
+  margin-bottom:0;
+}
+@media(max-width:560px){
+  .shell{padding-bottom:146px}
+  .guide-steps{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+  .guide-step{
+    min-height:72px !important;
+    padding:9px 5px !important;
+    flex-direction:column;
+    gap:6px;
+  }
+  .guide-step b{
+    font-size:9px;
+    line-height:1.35;
+  }
+  .guide-step span{
+    width:25px;height:25px;flex-basis:25px
+  }
+  .nav{
+    height:56px;
+    bottom:5px;
+  }
+  .nav-icon{font-size:12px}
+  .nav-label{font-size:8px}
+  .content{padding-bottom:24px}
+}
