@@ -1,0 +1,25 @@
+{
+  "name": "MLB POSTSEASON PREDICTION 2026",
+  "short_name": "MLB予想",
+  "description": "MLBポストシーズン予想ゲーム 2026",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f2744",
+  "theme_color": "#0f2744",
+  "icons": [
+    {
+      "src": "./icons/field-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
