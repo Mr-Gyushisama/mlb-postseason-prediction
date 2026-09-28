@@ -2514,3 +2514,44 @@ body:before{
     font-size:10px;
   }
 }
+
+
+/* PREMIUM LOGIN GLASS */
+.login-card,.setup-card{
+  background:rgba(255,255,255,.76) !important;
+  border:1px solid rgba(255,255,255,.78) !important;
+  box-shadow:0 22px 58px rgba(20,54,89,.14) !important;
+  backdrop-filter:blur(20px) saturate(145%);
+  -webkit-backdrop-filter:blur(20px) saturate(145%);
+}
+.login-card:after,.setup-card:after{
+  content:"";
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.55);
+}
+.login-card,.setup-card{position:relative;overflow:hidden}
+.brand-badge{
+  background:rgba(255,255,255,.62) !important;
+  border:1px solid rgba(255,255,255,.82) !important;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.role-switch{
+  background:rgba(238,244,250,.70) !important;
+  border:1px solid rgba(202,216,230,.76) !important;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.login-submit{
+  background:linear-gradient(135deg,#183d67,#267cc7 58%,#cf3150) !important;
+  border-color:rgba(255,255,255,.18) !important;
+  box-shadow:0 12px 28px rgba(28,81,132,.22) !important;
+}
+.setup-step-label{
+  background:rgba(237,247,255,.78) !important;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
