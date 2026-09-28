@@ -74,6 +74,19 @@ function renderLogin(){
 }
 async function refresh(){try{state=await api("state");render()}catch(e){logoutLocal()}}
 
+function uiIcon(name){
+  const common='viewBox="0 0 24 24" aria-hidden="true"';
+  const icons={
+    home:`<svg ${common}><path d="M3 11.2 12 4l9 7.2v8.3a1.5 1.5 0 0 1-1.5 1.5h-5v-6h-5v6h-5A1.5 1.5 0 0 1 3 19.5z"/></svg>`,
+    games:`<svg ${common}><circle cx="12" cy="12" r="8.2"/><path d="M6.7 7.5c2.1 1.4 3.2 3.1 3.3 5.2M17.3 7.5c-2.1 1.4-3.2 3.1-3.3 5.2M6.8 16.3c2-1.4 3.1-3 3.2-5.1M17.2 16.3c-2-1.4-3.1-3-3.2-5.1"/></svg>`,
+    series:`<svg ${common}><path d="M12 3 21 12 12 21 3 12z"/><path d="M12 7v10M7 12h10"/></svg>`,
+    rank:`<svg ${common}><path d="M8 4h8v4a4 4 0 0 1-8 0z"/><path d="M8 6H5v1.5A3.5 3.5 0 0 0 8.2 11M16 6h3v1.5a3.5 3.5 0 0 1-3.2 3.5M12 12v4M9 20h6M10 16h4v4h-4z"/></svg>`,
+    pre:`<svg ${common}><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>`,
+    admin:`<svg ${common}><circle cx="12" cy="12" r="3"/><path d="M19 13.5v-3l-2-.7-.8-1.9.9-1.9-2.1-2.1-1.9.9-1.9-.8-.7-2h-3l-.7 2-1.9.8-1.9-.9L.9 6l.9 1.9L1 9.8v3l2 .7.8 1.9-.9 1.9L5 19.4l1.9-.9 1.9.8.7 2h3l.7-2 1.9-.8 1.9.9 2.1-2.1-.9-1.9z"/></svg>`,
+    bell:`<svg ${common}><path d="M6.5 17h11l-1.2-1.7V10a4.3 4.3 0 0 0-8.6 0v5.3z"/><path d="M10 19a2.2 2.2 0 0 0 4 0"/></svg>`
+  };
+  return icons[name]||"";
+}
 function pendingStatus(){
   if(!state||state.actor.role!=="player")return {pre:0,series:0,games:0,total:0};
   const now=new Date(state.serverTime||Date.now());
@@ -87,19 +100,19 @@ function pendingStatus(){
 }
 function shell(body){
   const pending=pendingStatus();
-  const nav=[["home","ホーム","⌂",pending.total],["games","試合","⚾",pending.games],["series","シリーズ","◇",pending.series],["rank","順位","🏆",0],["pre","大会前","★",pending.pre],["admin","管理","⚙",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
+  const nav=[["home","ホーム",pending.total],["games","試合",pending.games],["series","シリーズ",pending.series],["rank","順位",0],["pre","大会前",pending.pre],["admin","管理",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
   return `<div class="shell">
     <header class="topbar">
       <div class="topbar-row">
         <div class="header-brand"><div class="header-mark">MLB</div><div><div class="eyebrow">POSTSEASON PREDICTION 2026</div><h2>${esc(state.actor.display_name)}</h2></div></div>
         <div class="header-actions">
-          ${pending.total?`<button class="header-notify" data-go="home" aria-label="未対応${pending.total}件">🔔<span>${pending.total>9?"9+":pending.total}</span></button>`:""}
+          ${pending.total?`<button class="header-notify" data-go="home" aria-label="未対応${pending.total}件">${uiIcon("bell")}<span>${pending.total>9?"9+":pending.total}</span></button>`:""}
           <button id="logout" class="btn ghost small">ログアウト</button>
         </div>
       </div>
     </header>
     <main class="content">${body}</main>
-    <nav class="nav">${nav.map(([k,l,icon,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-icon">${icon}</span><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
+    <nav class="nav">${nav.map(([k,l,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-icon">${uiIcon(k)}</span><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
     <div id="busy" class="loading-overlay hidden"><div class="loading-box"><div class="spinner"></div><div class="muted" style="margin-top:8px">更新中...</div></div></div>
   </div>`;
 }
