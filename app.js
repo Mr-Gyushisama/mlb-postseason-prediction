@@ -445,14 +445,22 @@ function preView(){
 function adminView(){
   if(state.actor.role!=="admin")return "";
   const names=state.players.map(p=>`<label class="label">${esc(p.id.toUpperCase())}</label><input class="field" id="nm_${p.id}" value="${esc(p.display_name)}">`).join("");
-  const pendingResults=state.games.filter(g=>g.status!=="final").length;
+  const pendingResults=state.games.filter(g=>g.status!=="final"&&g.status!=="cancelled").length;
   const completedGames=state.games.filter(g=>g.status==="final").length;
   const activeSeries=state.series.filter(s=>s.status==="active").length;
   const orderedGames=[...state.games].sort((a,b)=>(a.status==="final"?1:0)-(b.status==="final"?1:0)||new Date(a.starts_at)-new Date(b.starts_at));
-  const gameRows=orderedGames.map(g=>`<div class="admin-block result-row ${g.status==="final"?"is-final":"needs-result"}">
-    <div class="result-row-head"><div><b>${esc(teamName(g.away_team))} <span>@</span> ${esc(teamName(g.home_team))}</b><small>${jst(g.starts_at)}</small></div>${g.status==="final"?'<span class="pill final">反映済</span>':'<span class="pill pending">未確定</span>'}</div>
-    <div class="three-col result-inputs" style="margin-top:7px"><input class="field" id="ra_${g.id}" type="number" placeholder="アウェー" value="${g.away_score??""}"><input class="field" id="rh_${g.id}" type="number" placeholder="ホーム" value="${g.home_score??""}"><button class="btn ${g.status==="final"?"secondary":""}" data-result="${g.id}">${g.status==="final"?"結果を更新":"試合結果を確定"}</button></div>
-  </div>`).join("");
+  const now=new Date(state.serverTime);
+  const gameRows=orderedGames.map(g=>{
+    const final=g.status==="final",cancelled=g.status==="cancelled",started=new Date(g.starts_at)<=now,canResult=started&&!cancelled;
+    const pill=cancelled?'<span class="pill cancelled">開催なし</span>':final?'<span class="pill final">反映済</span>':started?'<span class="pill pending">未確定</span>':'<span class="pill lock">開始待ち</span>';
+    const rowClass=cancelled?"is-cancelled":final?"is-final":"needs-result";
+    const disabled=canResult?"":"disabled";
+    const label=cancelled?"開催なし":final?"結果を更新":started?"試合結果を確定":"開始待ち";
+    return `<div class="admin-block result-row ${rowClass}">
+      <div class="result-row-head"><div><b>${esc(teamName(g.away_team))} <span>@</span> ${esc(teamName(g.home_team))}</b><small>${jst(g.starts_at)}</small></div>${pill}</div>
+      <div class="three-col result-inputs" style="margin-top:7px"><input class="field" id="ra_${g.id}" type="number" min="0" max="99" placeholder="アウェー" value="${g.away_score??""}" ${disabled}><input class="field" id="rh_${g.id}" type="number" min="0" max="99" placeholder="ホーム" value="${g.home_score??""}" ${disabled}><button class="btn ${final?"secondary":""}" data-result="${g.id}" ${disabled}>${label}</button></div>
+    </div>`;
+  }).join("");
   return viewTitle("管理者メニュー","結果反映を最優先に、プレイヤー設定・ラウンド管理・後続カード登録を行います。")+`
   <section class="admin-overview glass-admin">
     <div><span>未確定試合</span><b>${pendingResults}</b></div>
@@ -469,14 +477,14 @@ function adminView(){
   </details>
   <details class="card"><summary>シリーズ / 試合登録</summary><div class="admin-block">
     <div class="notice">地区シリーズ以降や開始時刻変更用です。既存IDを入力すると編集、空欄なら新規登録です。</div>
-    <label class="label">シリーズID（編集時のみ）</label><input id="seriesId" class="field">
+    <label class="label">編集するシリーズ</label><select id="seriesId" class="field"><option value="">新規シリーズ</option>${state.series.map(x=>`<option value="${x.id}">${esc(x.code)}｜${esc(teamName(x.team_a))} vs ${esc(teamName(x.team_b))}</option>`).join("")}</select>
     <div class="two-col"><div><label class="label">シリーズコード</label><input id="seriesCode" class="field"></div><div><label class="label">リーグ</label><select id="seriesLeague" class="field"><option value="AL">ア・リーグ</option><option value="NL">ナ・リーグ</option></select></div></div>
     <label class="label">ラウンド</label><select id="seriesRound" class="field"><option value="WCS">ワイルドカード</option><option value="DS">地区シリーズ</option><option value="LCS">リーグ優勝決定シリーズ</option><option value="WS">ワールドシリーズ</option></select>
     <div class="two-col"><div><label class="label">チームA</label><input id="teamA" class="field" placeholder="例：NYY"></div><div><label class="label">チームB</label><input id="teamB" class="field" placeholder="例：BOS"></div></div>
     <div class="two-col"><div><label class="label">シードA</label><input id="seedA" class="field" type="number"></div><div><label class="label">シードB</label><input id="seedB" class="field" type="number"></div></div>
     <label class="label">開始日時</label><input id="seriesStart" class="field" type="datetime-local"><button id="saveSeriesAdmin" class="btn" style="width:100%;margin-top:8px">シリーズを保存</button>
     <div class="sep"></div>
-    <label class="label">試合ID（編集時のみ）</label><input id="gameId" class="field"><label class="label">シリーズID</label><input id="gameSeriesId" class="field">
+    <label class="label">編集する試合</label><select id="gameId" class="field"><option value="">新規試合</option>${state.games.map(x=>`<option value="${x.id}">${esc(roundName(state.series.find(s=>s.id===x.series_id)?.round))} 第${x.game_no}戦｜${esc(teamName(x.away_team))} @ ${esc(teamName(x.home_team))}</option>`).join("")}</select><label class="label">シリーズ</label><select id="gameSeriesId" class="field"><option value="">選択してください</option>${state.series.map(x=>`<option value="${x.id}">${esc(x.code)}｜${esc(teamName(x.team_a))} vs ${esc(teamName(x.team_b))}</option>`).join("")}</select>
     <div class="three-col"><div><label class="label">第何戦</label><input id="gameNo" class="field" type="number" min="1" max="7"></div><div><label class="label">アウェー</label><input id="gameAway" class="field"></div><div><label class="label">ホーム</label><input id="gameHome" class="field"></div></div>
     <label class="label">開始日時</label><input id="gameStart" class="field" type="datetime-local"><button id="saveGameAdmin" class="btn" style="width:100%;margin-top:8px">試合を保存</button>
   </div></details>`;
