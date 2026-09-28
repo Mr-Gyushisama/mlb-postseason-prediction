@@ -227,7 +227,7 @@ function homeView(){
       <summary>遊び方を見る</summary>
       <div class="flow-list help-flow">
         <div class="flow-item"><span>1</span><div><b>大会前・シリーズを予想</b><small>締切前に勝者やシリーズ成績を登録</small></div></div>
-        <div class="flow-item"><span>2</span><div><b>各試合のスコアとポイントを予想</b><small>1試合1〜10P。BOOSTは各ラウンド1回</small></div></div>
+        <div class="flow-item"><span>2</span><div><b>各試合のスコアとポイントを予想</b><small>1試合の上限はラウンド別。BOOSTは各ラウンド1回</small></div></div>
         <div class="flow-item"><span>3</span><div><b>結果後に順位表を確認</b><small>採点は自動。獲得ポイントで5人の順位が決定</small></div></div>
       </div>
     </details>
@@ -282,7 +282,7 @@ function rulesBlock(){
 
       <section class="rule-section rule-budget">
         <h4>配分ポイント</h4>
-        <p>初期 <b>${c.initial_points??150}P</b>。1試合 <b>1〜10P</b>を配分します。最低使用枠は WCS ${mn.WCS??20}P ／ DS ${mn.DS??30}P ／ LCS ${mn.LCS??20}P ／ WS ${mn.WS??10}P、自由枠は <b>${c.free_points??70}P</b>です。</p>
+        <p>初期 <b>${c.initial_points??150}P</b>。1試合の最大配分は <b>WCS 10P ／ DS 8P ／ LCS 6P ／ WS 5P</b>です。最低使用枠は WCS ${mn.WCS??20}P ／ DS ${mn.DS??30}P ／ LCS ${mn.LCS??20}P ／ WS ${mn.WS??10}P、自由枠は <b>${c.free_points??70}P</b>です。</p>
         <p>シリーズ予想・大会前予想では、この150Pは消費しません。試合予想を締切前に取り消した場合は、配分PとBOOSTが未使用へ戻ります。</p>
       </section>
     </div>
@@ -324,9 +324,9 @@ function gamesView(){
     const wb=!lb&&!pb?0:!lb&&pb?1:2;
     return wa-wb||new Date(a.starts_at)-new Date(b.starts_at);
   });
-  let out=viewTitle("試合予想","未予想の試合を上に表示しています。")+guideSteps(["予想スコアを入力","1〜10Pを配分","BOOSTを選んで保存"])+(state.actor.role==="player"?`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>${predicted}</b></div><div class="status-count"><span>受付中</span><b>${open.length}</b></div></div>`:"")+budgetCard();
+  let out=viewTitle("試合予想","未予想の試合を上に表示しています。")+guideSteps(["予想スコアを入力","上限内でPを配分","BOOSTを選んで保存"])+(state.actor.role==="player"?`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>${predicted}</b></div><div class="status-count"><span>受付中</span><b>${open.length}</b></div></div>`:"")+budgetCard();
   for(const g of ordered){
-    const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status);
+    const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status),stakeMax=state.stakeMaxByRound?.[s?.round]??10;
     let cardState="game-neutral",pill="";
     if(g.status==="final"){cardState="game-final";pill='<span class="pill final">試合終了</span>'}
     else if(state.actor.role!=="player"){cardState=lock?"game-locked":"game-neutral";pill=lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}
@@ -341,7 +341,7 @@ function gamesView(){
       ${state.actor.role==="player"?`
       <div class="score-grid">
         <div><div class="team">${esc(teamName(g.away_team))}</div><input id="aw_${g.id}" class="field" type="number" min="0" max="30" value="${p?.away_score??""}" ${lock?"disabled":""}></div>
-        <div><label class="label" style="text-align:center">配分P</label><input id="st_${g.id}" class="field" type="number" min="1" max="10" value="${p?.stake??1}" ${lock?"disabled":""}></div>
+        <div><label class="label" style="text-align:center">配分P <span class="stake-limit">最大${stakeMax}</span></label><input id="st_${g.id}" class="field" type="number" min="1" max="${stakeMax}" value="${p?.stake??1}" ${lock?"disabled":""}></div>
         <div><div class="team">${esc(teamName(g.home_team))}</div><input id="ho_${g.id}" class="field" type="number" min="0" max="30" value="${p?.home_score??""}" ${lock?"disabled":""}></div>
       </div>
       <div class="boost-row"><label class="boost"><input id="bo_${g.id}" type="checkbox" ${p?.boost?"checked":""} ${lock?"disabled":""}> BOOSTを使う</label><span class="tiny">各ラウンド1回・獲得P×2</span></div>
