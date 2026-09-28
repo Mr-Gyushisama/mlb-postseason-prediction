@@ -74,6 +74,63 @@ function renderLogin(){
 }
 async function refresh(){try{state=await api("state");render()}catch(e){logoutLocal()}}
 
+function renderSetup(){
+  app.innerHTML=\`
+  <section class="setup-shell">
+    <div class="setup-wrap">
+      <div class="setup-brand">
+        <div class="brand-badge"><span class="brand-mark">MLB</span> FIRST SETUP</div>
+        <h1>初回設定</h1>
+        <p>\${esc(state.actor.id.toUpperCase())} の名前とPINを登録してください。</p>
+      </div>
+      <div class="setup-card">
+        <div class="setup-step-label">STEP 1</div>
+        <label class="label">表示する名前</label>
+        <input id="setupName" class="field setup-field" maxlength="40" autocomplete="name" placeholder="あなたの名前">
+        <div class="setup-hint">順位表や予想画面に表示されます。</div>
+
+        <div class="setup-step-label">STEP 2</div>
+        <label class="label">新しい4桁PIN</label>
+        <input id="setupPin" class="field setup-field pin-input" maxlength="4" inputmode="numeric" autocomplete="new-password" placeholder="••••">
+        <div class="setup-hint">今回ログインした仮PINとは違う番号を設定してください。</div>
+
+        <label class="label">新しいPINをもう一度</label>
+        <input id="setupPinConfirm" class="field setup-field pin-input" maxlength="4" inputmode="numeric" autocomplete="new-password" placeholder="••••">
+
+        <div id="setupError" class="error"></div>
+        <button id="setupSave" class="btn danger setup-save">この内容でゲームを開始 →</button>
+        <button id="setupLogout" class="btn ghost setup-logout">ログアウト</button>
+      </div>
+    </div>
+  </section>\`;
+
+  document.getElementById("setupLogout").onclick=async()=>{
+    try{await api("logout")}catch{}
+    logoutLocal();
+  };
+  document.getElementById("setupSave").onclick=async()=>{
+    const name=document.getElementById("setupName").value.trim();
+    const pin=document.getElementById("setupPin").value.trim();
+    const confirmPin=document.getElementById("setupPinConfirm").value.trim();
+    const er=document.getElementById("setupError"),btn=document.getElementById("setupSave");
+    er.textContent="";
+    if(!name){er.textContent="名前を入力してください。";return}
+    if(name.length>40){er.textContent="名前は40文字以内で入力してください。";return}
+    if(!/^\d{4}$/.test(pin)){er.textContent="新しいPINは4桁の数字で入力してください。";return}
+    if(pin!==confirmPin){er.textContent="確認用PINが一致していません。";return}
+    try{
+      btn.disabled=true;btn.textContent="登録中...";
+      state=await api("completeSetup",{displayName:name,pin});
+      view="home";
+      render();
+    }catch(e){
+      er.textContent=errorText(e);
+      btn.disabled=false;btn.textContent="この内容でゲームを開始 →";
+    }
+  };
+}
+
+
 function uiIcon(name){
   const common='viewBox="0 0 24 24" aria-hidden="true"';
   const icons={
@@ -328,6 +385,7 @@ function adminView(){
 }
 
 function render(){
+  if(state?.actor?.role==="player"&&state.actor.setup_required){renderSetup();return}
   const body=view==="home"?homeView():view==="games"?gamesView():view==="series"?seriesView():view==="rank"?rankView():view==="pre"?preView():adminView();
   app.innerHTML=shell(body);
   document.getElementById("logout").onclick=async()=>{try{await api("logout")}catch{}logoutLocal()};
