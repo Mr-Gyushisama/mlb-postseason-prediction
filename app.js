@@ -1,7 +1,7 @@
 const API="https://lidgvyhsytwwfndsmeic.supabase.co/functions/v1/mlb-prediction";
 const app=document.getElementById("app");
 let token=localStorage.getItem("mlb_token")||"";
-let state=null,view="home",role="player",actorId="p1",busy=false;
+let state=null,view="home",role="player",actorId="p1",busy=false,toastMessage="";
 
 const TEAM_NAMES={
   NYY:"ヤンキース",BOS:"レッドソックス",TOR:"ブルージェイズ",BAL:"オリオールズ",TB:"レイズ",
@@ -158,10 +158,10 @@ function pendingStatus(){
 function shell(body){
   const pending=pendingStatus();
   const nav=[["home","ホーム",0],["games","試合",pending.games],["series","シリーズ",pending.series],["rank","順位",0],["pre","大会前",pending.pre],["admin","管理",0]].filter(x=>x[0]!=="admin"||state.actor.role==="admin");
-  return `<div class="shell">
-    <header class="topbar">
+  return `<div class="shell premium-shell">
+    <header class="topbar glass-topbar">
       <div class="topbar-row">
-        <div class="header-brand"><div class="header-mark">MLB</div><div><div class="eyebrow">POSTSEASON PREDICTION 2026</div><h2>${esc(state.actor.display_name)}</h2></div></div>
+        <div class="header-brand"><div class="header-mark">MLB</div><div class="header-copy"><div class="eyebrow">POSTSEASON PREDICTION 2026</div><h2>${esc(state.actor.display_name)}</h2></div></div>
         <div class="header-actions">
           ${pending.total?`<button class="header-notify" data-go="home" aria-label="未入力の予想が${pending.total}件あります">${uiIcon("bell")}<span class="notify-label">未対応</span><strong>${pending.total}</strong></button>`:`<div class="header-clear">✓ 入力済</div>`}
           <button id="logout" class="btn ghost small">ログアウト</button>
@@ -169,7 +169,8 @@ function shell(body){
       </div>
     </header>
     <main class="content">${body}</main>
-    <nav class="nav">${nav.map(([k,l,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-icon">${uiIcon(k)}</span><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
+    <nav class="nav glass-nav">${nav.map(([k,l,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-icon">${uiIcon(k)}</span><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
+    ${toastMessage?`<div id="appToast" class="app-toast" role="status"><span class="toast-check">✓</span><span>${esc(toastMessage)}</span></div>`:""}
     <div id="busy" class="loading-overlay hidden"><div class="loading-box"><div class="spinner"></div><div class="muted" style="margin-top:8px">更新中...</div></div></div>
   </div>`;
 }
@@ -186,17 +187,17 @@ function homeView(){
   const openGames=state.games.filter(g=>new Date(g.starts_at)>now&&g.status==="scheduled");
   const undoneSeries=openSeries.filter(s=>!mineSeries.some(p=>p.series_id===s.id));
   const undoneGames=openGames.filter(g=>!mineGame.some(p=>p.game_id===g.id));
-  let next={view:"rank",icon:"🏆",label:"予想入力は完了",title:"順位表を確認しよう",desc:"結果が確定すると自動でポイントと順位が更新されます。",button:"順位表を見る"};
+  let next={view:"rank",icon:"RANK",label:"予想入力は完了",title:"順位表を確認しよう",desc:"結果が確定すると自動でポイントと順位が更新されます。",button:"順位表を見る"};
   if(state.actor.role==="admin"){
-    next={view:"admin",icon:"⚙",label:"管理者メニュー",title:"試合結果と日程を管理",desc:"結果確定・ラウンド管理・次ラウンドの試合登録を行えます。",button:"管理画面を開く"};
+    next={view:"admin",icon:"ADMIN",label:"管理者メニュー",title:"試合結果と日程を管理",desc:"結果確定・ラウンド管理・次ラウンドの試合登録を行えます。",button:"管理画面を開く"};
   }else if(preOpen&&!minePre){
-    next={view:"pre",icon:"①",label:"最初にやること",title:"大会前予想を登録しよう",desc:"ア・リーグ、ナ・リーグ、ワールドシリーズの優勝予想を登録します。",button:"大会前予想へ"};
+    next={view:"pre",icon:"01",label:"最初にやること",title:"大会前予想を登録しよう",desc:"ア・リーグ、ナ・リーグ、ワールドシリーズの優勝予想を登録します。",button:"大会前予想へ"};
   }else if(undoneSeries.length){
     const s=undoneSeries[0];
-    next={view:"series",icon:"②",label:"次にやること",title:"シリーズ予想を入力しよう",desc:`${teamName(s.team_a)} vs ${teamName(s.team_b)} の勝者と最終成績を予想します。`,button:"シリーズ予想へ"};
+    next={view:"series",icon:"02",label:"次にやること",title:"シリーズ予想を入力しよう",desc:`${teamName(s.team_a)} vs ${teamName(s.team_b)} の勝者と最終成績を予想します。`,button:"シリーズ予想へ"};
   }else if(undoneGames.length){
     const g=undoneGames[0];
-    next={view:"games",icon:"③",label:"次にやること",title:"試合予想を入力しよう",desc:`${teamName(g.away_team)} vs ${teamName(g.home_team)} のスコアと配分ポイントを入力します。`,button:"試合予想へ"};
+    next={view:"games",icon:"03",label:"次にやること",title:"試合予想を入力しよう",desc:`${teamName(g.away_team)} vs ${teamName(g.home_team)} のスコアと配分ポイントを入力します。`,button:"試合予想へ"};
   }
   const seriesDone=openSeries.length-undoneSeries.length;
   const gameDone=openGames.length-undoneGames.length;
@@ -293,7 +294,7 @@ function budgetCard(){
   if(!state.budget)return"";
   const b=state.budget;
   return `<section class="card glow">
-    <div class="budget-head"><div><div class="muted">👑 残り使用可能ポイント</div><div class="tiny">150Pを各ラウンドへ戦略的に配分</div></div><div class="metric">${b.available}<span style="font-size:15px;color:#9eb1c3">P</span></div></div>
+    <div class="budget-head"><div><div class="muted budget-label">PLAYOFF BUDGET</div><div class="tiny">150Pを各ラウンドへ戦略的に配分</div></div><div class="metric">${b.available}<span style="font-size:15px;color:#9eb1c3">P</span></div></div>
     <div class="budget-row">
       <div class="budget-box"><span>自由枠</span><b>${b.freeRemaining}</b><span>/70</span></div>
       <div class="budget-box"><span>ワイルドカード</span><b>${b.spentByRound.WCS}</b><span>/最低20</span></div>
@@ -390,7 +391,7 @@ function seriesView(){
   }).join("");
 }
 function rankView(){
-  return viewTitle("🏆 順位表","試合結果が確定すると自動で採点され、順位が更新されます。")+
+  return viewTitle("順位表","試合結果が確定すると自動で採点され、順位が更新されます。")+
   `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>`
     <div class="rank-row rank-${i+1}">
       <div class="rank-no">${i+1}</div>
@@ -402,25 +403,38 @@ function rankView(){
 function preView(){
   const p=state.prePredictions.find(x=>x.actor_id===state.actor.id),lock=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime);
   return viewTitle("大会前予想","ポストシーズン開始前に優勝チームを予想します。")+guideSteps(["AL・NL優勝","WS優勝","最終成績を保存"])+
-  `<section class="card glow"><div class="section-title"><h3>優勝予想</h3>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
-  <div class="muted">締切：${jst(state.config.pre_lock_at)}</div>
+  `<section class="card glow pre-card"><div class="section-title"><div><div class="section-kicker">PRESEASON PICKS</div><h3>優勝予想</h3></div>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
+  <div class="muted pre-deadline">締切：${jst(state.config.pre_lock_at)}</div>
   ${state.actor.role==="player"?`
-  <label class="label">ア・リーグ優勝</label><select id="preAL" class="field" ${lock?"disabled":""}>${teamOptions(AL_TEAMS,p?.al_champion||"")}</select>
-  <label class="label">ナ・リーグ優勝</label><select id="preNL" class="field" ${lock?"disabled":""}>${teamOptions(NL_TEAMS,p?.nl_champion||"")}</select>
-  <label class="label">ワールドシリーズ優勝</label><select id="preWS" class="field" ${lock?"disabled":""}>${teamOptions(ALL_TEAMS,p?.ws_champion||"")}</select>
-  <label class="label">ワールドシリーズ最終成績</label><select id="preLW" class="field" ${lock?"disabled":""}>${[0,1,2,3].map(n=>`<option value="${n}" ${+p?.ws_loser_wins===n?"selected":""}>4-${n}</option>`).join("")}</select>
-  ${lock?"":'<button id="savePre" class="btn danger" style="width:100%;margin-top:10px">✓ 大会前予想を保存</button>'}
+  <div class="pre-pick-grid">
+    <div class="pre-pick-group"><span class="pre-league al">AL</span><label class="label">ア・リーグ優勝</label><select id="preAL" class="field" ${lock?"disabled":""}>${teamOptions(AL_TEAMS,p?.al_champion||"")}</select></div>
+    <div class="pre-pick-group"><span class="pre-league nl">NL</span><label class="label">ナ・リーグ優勝</label><select id="preNL" class="field" ${lock?"disabled":""}>${teamOptions(NL_TEAMS,p?.nl_champion||"")}</select></div>
+    <div class="pre-pick-group ws"><span class="pre-league ws">WS</span><label class="label">ワールドシリーズ優勝</label><select id="preWS" class="field" ${lock?"disabled":""}>${teamOptions(ALL_TEAMS,p?.ws_champion||"")}</select><label class="label">ワールドシリーズ最終成績</label><select id="preLW" class="field" ${lock?"disabled":""}>${[0,1,2,3].map(n=>`<option value="${n}" ${+p?.ws_loser_wins===n?"selected":""}>4-${n}</option>`).join("")}</select></div>
+  </div>
+  ${lock?"":'<button id="savePre" class="btn danger pre-save">✓ 大会前予想を保存</button>'}
   `:''}</section>`;
 }
 function adminView(){
   if(state.actor.role!=="admin")return "";
   const names=state.players.map(p=>`<label class="label">${esc(p.id.toUpperCase())}</label><input class="field" id="nm_${p.id}" value="${esc(p.display_name)}">`).join("");
-  const gameRows=state.games.map(g=>`<div class="admin-block"><div class="muted">${esc(teamName(g.away_team))} @ ${esc(teamName(g.home_team))} · ${jst(g.starts_at)}</div><div class="three-col" style="margin-top:7px"><input class="field" id="ra_${g.id}" type="number" placeholder="アウェー" value="${g.away_score??""}"><input class="field" id="rh_${g.id}" type="number" placeholder="ホーム" value="${g.home_score??""}"><button class="btn" data-result="${g.id}">試合結果を確定</button></div></div>`).join("");
-  return viewTitle("管理者メニュー","プレイヤー設定、試合結果、ラウンド管理、後続カードの登録を行います。")+`
-  <details class="card" open><summary>プレイヤー設定</summary><div class="admin-block">${names}<button id="saveNames" class="btn" style="width:100%;margin-top:10px">名前を保存</button></div>
+  const pendingResults=state.games.filter(g=>g.status!=="final").length;
+  const completedGames=state.games.filter(g=>g.status==="final").length;
+  const activeSeries=state.series.filter(s=>s.status==="active").length;
+  const orderedGames=[...state.games].sort((a,b)=>(a.status==="final"?1:0)-(b.status==="final"?1:0)||new Date(a.starts_at)-new Date(b.starts_at));
+  const gameRows=orderedGames.map(g=>`<div class="admin-block result-row ${g.status==="final"?"is-final":"needs-result"}">
+    <div class="result-row-head"><div><b>${esc(teamName(g.away_team))} <span>@</span> ${esc(teamName(g.home_team))}</b><small>${jst(g.starts_at)}</small></div>${g.status==="final"?'<span class="pill final">反映済</span>':'<span class="pill pending">未確定</span>'}</div>
+    <div class="three-col result-inputs" style="margin-top:7px"><input class="field" id="ra_${g.id}" type="number" placeholder="アウェー" value="${g.away_score??""}"><input class="field" id="rh_${g.id}" type="number" placeholder="ホーム" value="${g.home_score??""}"><button class="btn ${g.status==="final"?"secondary":""}" data-result="${g.id}">${g.status==="final"?"結果を更新":"試合結果を確定"}</button></div>
+  </div>`).join("");
+  return viewTitle("管理者メニュー","結果反映を最優先に、プレイヤー設定・ラウンド管理・後続カード登録を行います。")+`
+  <section class="admin-overview glass-admin">
+    <div><span>未確定試合</span><b>${pendingResults}</b></div>
+    <div><span>反映済試合</span><b>${completedGames}</b></div>
+    <div><span>進行中シリーズ</span><b>${activeSeries}</b></div>
+  </section>
+  <details class="card admin-results" open><summary>試合結果入力</summary><div class="notice result-flow-note">結果確定後、試合得点 → シリーズ勝敗 → 順位表まで自動で再計算します。</div>${gameRows}</details>
+  <details class="card"><summary>プレイヤー設定</summary><div class="admin-block">${names}<button id="saveNames" class="btn" style="width:100%;margin-top:10px">名前を保存</button></div>
     <div class="admin-block"><h3>PIN変更</h3><div class="two-col mobile-stack"><select id="pinPlayer" class="field">${state.players.map(p=>`<option value="${p.id}">${esc(p.display_name)}</option>`).join("")}<option value="admin">管理者</option></select><input id="newPin" class="field" maxlength="4" inputmode="numeric" placeholder="新しい4桁PIN"></div><button id="savePin" class="btn danger" style="width:100%;margin-top:8px">PINを変更</button></div>
   </details>
-  <details class="card"><summary>試合結果入力</summary>${gameRows}</details>
   <details class="card"><summary>ラウンド管理</summary><div class="admin-block">${state.rounds.map(r=>`<button class="btn ${r.closed?"secondary":""}" style="width:100%;margin:4px 0" data-round="${r.round}" data-closed="${r.closed}">${roundName(r.round)} ${r.closed?"再開":"終了"}</button>`).join("")}</div></details>
   <details class="card"><summary>大会前予想管理</summary><div class="admin-block"><label class="label">締切日時</label><input id="preLock" class="field" type="datetime-local" value="${localInput(state.config.pre_lock_at)}"><button id="savePreLock" class="btn" style="width:100%;margin-top:8px">締切を更新</button></div>
     <div class="admin-block"><label class="label">ア・リーグ優勝</label><input id="actualAL" class="field" placeholder="例：NYY"><label class="label">ナ・リーグ優勝</label><input id="actualNL" class="field" placeholder="例：LAD"><label class="label">ワールドシリーズ優勝</label><input id="actualWS" class="field" placeholder="例：LAD"><label class="label">WS最終成績</label><select id="actualLW" class="field">${[0,1,2,3].map(n=>`<option value="${n}">4-${n}</option>`).join("")}</select><button id="savePreResult" class="btn danger" style="width:100%;margin-top:8px">最終結果を確定・採点</button></div>
@@ -448,12 +462,30 @@ function render(){
   document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;render()});
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{view=b.dataset.go;render()});
   wireActions();
+  const toast=document.getElementById("appToast");
+  if(toast)setTimeout(()=>{toast.classList.add("hide");setTimeout(()=>{toastMessage=""},260)},2400);
 }
 function num(id){return Number(document.getElementById(id).value)}
 function val(id){return document.getElementById(id).value.trim()}
+function successText(action){
+  return ({
+    saveGamePrediction:"試合予想を保存しました。",
+    deleteGamePrediction:"予想を取り消しました。配分PとBOOSTを未使用へ戻しました。",
+    saveSeriesPrediction:"シリーズ予想を保存しました。",
+    savePrePrediction:"大会前予想を保存しました。",
+    adminSetGameResult:"試合結果を反映しました。採点・シリーズ勝敗・順位表を更新しました。",
+    adminSetPlayers:"プレイヤー名を更新しました。",
+    adminSetPin:"PINを更新しました。",
+    adminSetRoundClosed:"ラウンド状態を更新しました。",
+    adminSetPreLock:"大会前予想の締切を更新しました。",
+    adminSetPreResult:"大会前結果を確定し、順位表を更新しました。",
+    adminUpsertSeries:"シリーズ情報を保存しました。",
+    adminUpsertGame:"試合情報を保存しました。"
+  })[action]||"更新しました。";
+}
 async function mutate(action,payload,confirmText){
   if(confirmText&&!confirm(confirmText))return;
-  try{setBusy(true);state=await api(action,payload);render()}catch(e){alert(errorText(e));setBusy(false)}
+  try{setBusy(true);state=await api(action,payload);toastMessage=successText(action);render()}catch(e){alert(errorText(e));setBusy(false)}
 }
 function wireActions(){
   document.querySelectorAll("[data-save-game]").forEach(b=>b.onclick=()=>{const id=b.dataset.saveGame;mutate("saveGamePrediction",{gameId:id,awayScore:num("aw_"+id),homeScore:num("ho_"+id),stake:num("st_"+id),boost:document.getElementById("bo_"+id).checked})});
