@@ -914,3 +914,26 @@ details.card summary{font-size:14px}
   .nav-label{font-size:8px}
   .content{padding-bottom:24px}
 }
+
+
+/* LINE ICON SYSTEM */
+.nav-icon svg,.header-notify svg{
+  width:18px;height:18px;display:block;
+  fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round
+}
+.nav-icon{
+  color:#70879d;
+  display:grid;
+  place-items:center;
+}
+.nav button.active .nav-icon{
+  color:#f2f8ff;
+}
+.header-notify{
+  display:grid;
+  place-items:center;
+}
+.header-notify svg{
+  width:17px;height:17px;color:#ff758d
+}
