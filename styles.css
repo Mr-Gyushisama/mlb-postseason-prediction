@@ -1801,3 +1801,18 @@ details.card summary{color:#183651}
   .pre-rule-grid b{font-size:12px}
   .rule-budget p{font-size:9px}
 }
+
+
+/* ROUND-SPECIFIC STAKE LIMIT */
+.stake-limit{
+  display:inline-block;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:#eef6ff;
+  border:1px solid #cfe3f7;
+  color:#1f6fb8;
+  font-size:8px;
+  font-weight:900;
+  vertical-align:1px;
+}
