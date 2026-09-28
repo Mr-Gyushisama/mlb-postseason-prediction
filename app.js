@@ -75,13 +75,13 @@ function renderLogin(){
 async function refresh(){try{state=await api("state");render()}catch(e){logoutLocal()}}
 
 function renderSetup(){
-  app.innerHTML=\`
+  app.innerHTML=`
   <section class="setup-shell">
     <div class="setup-wrap">
       <div class="setup-brand">
         <div class="brand-badge"><span class="brand-mark">MLB</span> FIRST SETUP</div>
         <h1>初回設定</h1>
-        <p>\${esc(state.actor.id.toUpperCase())} の名前とPINを登録してください。</p>
+        <p>${esc(state.actor.id.toUpperCase())} の名前とPINを登録してください。</p>
       </div>
       <div class="setup-card">
         <div class="setup-step-label">STEP 1</div>
@@ -102,7 +102,7 @@ function renderSetup(){
         <button id="setupLogout" class="btn ghost setup-logout">ログアウト</button>
       </div>
     </div>
-  </section>\`;
+  </section>`;
 
   document.getElementById("setupLogout").onclick=async()=>{
     try{await api("logout")}catch{}
