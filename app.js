@@ -163,7 +163,7 @@ function shell(body){
       <div class="topbar-row">
         <div class="header-brand"><div class="header-mark">MLB</div><div><div class="eyebrow">POSTSEASON PREDICTION 2026</div><h2>${esc(state.actor.display_name)}</h2></div></div>
         <div class="header-actions">
-          ${pending.total?`<button class="header-notify" data-go="home" aria-label="未対応${pending.total}件">${uiIcon("bell")}<span>${pending.total>9?"9+":pending.total}</span></button>`:""}
+          ${pending.total?`<button class="header-notify" data-go="home" aria-label="未入力の予想が${pending.total}件あります">${uiIcon("bell")}<span class="notify-label">未対応</span><strong>${pending.total}</strong></button>`:`<div class="header-clear">✓ 入力済</div>`}
           <button id="logout" class="btn ghost small">ログアウト</button>
         </div>
       </div>
@@ -289,7 +289,7 @@ function gamesView(){
         <div><div class="team">${esc(teamName(g.home_team))}</div><input id="ho_${g.id}" class="field" type="number" min="0" max="30" value="${p?.home_score??""}" ${lock?"disabled":""}></div>
       </div>
       <div class="boost-row"><label class="boost"><input id="bo_${g.id}" type="checkbox" ${p?.boost?"checked":""} ${lock?"disabled":""}> BOOSTを使う</label><span class="tiny">各ラウンド1回のみ</span></div>
-      ${lock?"":`<button class="btn danger" style="width:100%" data-save-game="${g.id}">✓ 予想を保存</button>`}
+      ${lock?"":p?`<div class="prediction-actions"><button class="btn" data-save-game="${g.id}">予想を更新</button><button class="btn ghost cancel-prediction" data-cancel-game="${g.id}">予想を取消</button></div>`:`<button class="btn danger" style="width:100%" data-save-game="${g.id}">✓ 予想を保存</button>`}
       ${p?`<div class="prediction-saved"><span>✓ 予想済み</span><b>${p.away_score} - ${p.home_score} ／ ${p.stake}P${p.boost?" ／ BOOST":""}</b></div>`:(!lock?'<div class="prediction-needed">この試合はまだ予想していません</div>':"")}
       `:""}
     </section>`;
@@ -401,6 +401,7 @@ async function mutate(action,payload,confirmText){
 }
 function wireActions(){
   document.querySelectorAll("[data-save-game]").forEach(b=>b.onclick=()=>{const id=b.dataset.saveGame;mutate("saveGamePrediction",{gameId:id,awayScore:num("aw_"+id),homeScore:num("ho_"+id),stake:num("st_"+id),boost:document.getElementById("bo_"+id).checked})});
+  document.querySelectorAll("[data-cancel-game]").forEach(b=>b.onclick=()=>{const id=b.dataset.cancelGame;mutate("deleteGamePrediction",{gameId:id},"この試合の予想を取り消します。配分ポイントとBOOSTは未使用に戻ります。よろしいですか？")});
   document.querySelectorAll("[data-save-series]").forEach(b=>b.onclick=()=>{const id=b.dataset.saveSeries;mutate("saveSeriesPrediction",{seriesId:id,winnerTeam:val("sw_"+id),loserWins:num("sl_"+id),upset:document.getElementById("su_"+id).checked})});
   const pre=document.getElementById("savePre");if(pre)pre.onclick=()=>mutate("savePrePrediction",{alChampion:val("preAL"),nlChampion:val("preNL"),wsChampion:val("preWS"),wsLoserWins:num("preLW")});
   if(state.actor.role!=="admin")return;
