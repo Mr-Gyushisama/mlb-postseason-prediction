@@ -49,9 +49,15 @@ jobs:
           for attempt in 1 2 3 4 5 6; do
             CSS_OK=0
             APP_OK=0
+            MANIFEST_OK=0
+            ICON_OK=0
+            TOUCH_OK=0
             curl -L --fail --silent --show-error "${PAGE_URL}styles.css" | grep -F "PREMIUM SPORTS GLASS v1" >/dev/null && CSS_OK=1 || true
             curl -L --fail --silent --show-error "${PAGE_URL}app.js" | grep -F "admin-overview glass-admin" >/dev/null && APP_OK=1 || true
-            if [ "$CSS_OK" = "1" ] && [ "$APP_OK" = "1" ]; then
+            curl -L --fail --silent --show-error "${PAGE_URL}manifest.webmanifest" | grep -F "field-icon.svg" >/dev/null && MANIFEST_OK=1 || true
+            curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}icons/field-icon.svg" && ICON_OK=1 || true
+            curl -L --fail --silent --show-error --output /dev/null "${PAGE_URL}apple-touch-icon.png" && TOUCH_OK=1 || true
+            if [ "$CSS_OK" = "1" ] && [ "$APP_OK" = "1" ] && [ "$MANIFEST_OK" = "1" ] && [ "$ICON_OK" = "1" ] && [ "$TOUCH_OK" = "1" ]; then
               exit 0
             fi
             sleep 3
