@@ -570,6 +570,29 @@ function wireActions(){
     mutate("adminSetPreLock",{preLockAt},"大会前予想の締切日時を変更しますか？");
   };
   document.getElementById("savePreResult").onclick=()=>mutate("adminSetPreResult",{alChampion:val("actualAL"),nlChampion:val("actualNL"),wsChampion:val("actualWS"),wsLoserWins:num("actualLW")},"大会前予想の最終結果を確定して採点します。よろしいですか？");
+  const seriesSel=document.getElementById("seriesId");
+  if(seriesSel)seriesSel.onchange=()=>{
+    const x=state.series.find(v=>v.id===seriesSel.value);
+    if(!x)return;
+    document.getElementById("seriesCode").value=x.code||"";
+    document.getElementById("seriesLeague").value=x.league||"AL";
+    document.getElementById("seriesRound").value=x.round||"WCS";
+    document.getElementById("teamA").value=x.team_a||"";
+    document.getElementById("teamB").value=x.team_b||"";
+    document.getElementById("seedA").value=x.seed_a??"";
+    document.getElementById("seedB").value=x.seed_b??"";
+    document.getElementById("seriesStart").value=localInput(x.starts_at);
+  };
+  const gameSel=document.getElementById("gameId");
+  if(gameSel)gameSel.onchange=()=>{
+    const x=state.games.find(v=>v.id===gameSel.value);
+    if(!x)return;
+    document.getElementById("gameSeriesId").value=x.series_id||"";
+    document.getElementById("gameNo").value=x.game_no??"";
+    document.getElementById("gameAway").value=x.away_team||"";
+    document.getElementById("gameHome").value=x.home_team||"";
+    document.getElementById("gameStart").value=localInput(x.starts_at);
+  };
   document.getElementById("saveSeriesAdmin").onclick=()=>{
     const startsAt=isoVal("seriesStart");
     if(!startsAt){alert("シリーズ開始日時を入力してください。");return}
