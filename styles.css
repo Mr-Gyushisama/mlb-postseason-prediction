@@ -2588,3 +2588,93 @@ body:before{
   cursor:not-allowed;
   opacity:.55;
 }
+
+
+/* POSTSEASON FINAL FIELD v1 — 2026-09-29 */
+.postseason-field{
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(47,136,223,.12),transparent 30%),
+    linear-gradient(180deg,rgba(255,255,255,.96),rgba(247,251,255,.94)) !important;
+}
+.postseason-leagues{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.league-head{
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.08em;
+  padding:7px 9px;
+  border-radius:10px;
+  margin-bottom:6px;
+}
+.league-head.al{
+  color:#176db5;
+  background:#edf7ff;
+  border:1px solid #cae3f7;
+}
+.league-head.nl{
+  color:#b93550;
+  background:#fff1f4;
+  border:1px solid #f1cad3;
+}
+.postseason-team{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  margin:5px 0;
+  border-radius:10px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(207,220,232,.86);
+}
+.postseason-team .seed-no{
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  font-size:10px;
+  font-weight:950;
+  color:#fff;
+  background:linear-gradient(180deg,#2e86dc,#1e659f);
+}
+.postseason-team b{
+  display:block;
+  font-size:11px;
+  color:#15314e;
+}
+.postseason-team small{
+  display:block;
+  margin-top:1px;
+  font-size:8px;
+  color:#7b8da0;
+}
+.bracket-next{
+  display:grid;
+  gap:5px;
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
+  background:rgba(238,245,251,.86);
+  border:1px solid #d6e3ee;
+}
+.bracket-next b{
+  font-size:10px;
+  color:#15314e;
+}
+.bracket-next span{
+  font-size:9px;
+  color:#60768b;
+}
+@media(max-width:560px){
+  .postseason-leagues{grid-template-columns:1fr 1fr;gap:7px}
+  .postseason-team{padding:6px;gap:6px}
+  .postseason-team b{font-size:10px}
+  .postseason-team small{font-size:7px}
+  .postseason-team .seed-no{width:22px;height:22px;flex-basis:22px;font-size:9px}
+}
