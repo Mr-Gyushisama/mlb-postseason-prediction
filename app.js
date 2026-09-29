@@ -43,11 +43,11 @@ function timingMeta(d,status="scheduled"){
 }
 function gameTimingPanel(d,status="scheduled"){
   const t=timingMeta(d,status);
-  return `<div class="timing-panel ${t.cls}"><div class="timing-primary"><span>試合開始</span><b>${jst(d)}</b></div><div class="timing-secondary"><span>予想締切</span><strong>${jst(d)} <em>開始と同時</em></strong></div><div class="timing-countdown">${t.countdown}</div></div>`;
+  return `<div class="timing-panel ${t.cls}"><div class="timing-primary"><span>予想締切</span><b>${jst(d)}</b><small>（試合開始時刻と同時）</small></div><div class="timing-countdown">${t.countdown}</div></div>`;
 }
 function seriesTimingPanel(d,status="scheduled"){
   const t=timingMeta(d,status);
-  return `<div class="timing-panel series-timing ${t.cls}"><div class="timing-primary"><span>第1戦開始</span><b>${jst(d)}</b></div><div class="timing-secondary"><span>シリーズ予想締切</span><strong>${jst(d)} <em>第1戦開始と同時</em></strong></div><div class="timing-countdown">${t.countdown}</div></div>`;
+  return `<div class="timing-panel series-timing ${t.cls}"><div class="timing-primary"><span>シリーズ予想締切</span><b>${jst(d)}</b><small>（第1戦開始時刻と同時）</small></div><div class="timing-countdown">${t.countdown}</div></div>`;
 }
 function setBusy(v){busy=v;const e=document.getElementById("busy");if(e)e.classList.toggle("hidden",!v)}
 async function api(action,payload={}){
