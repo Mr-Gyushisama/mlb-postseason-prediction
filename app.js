@@ -32,6 +32,23 @@ function syncPreWsChoices(){
 const jst=d=>new Date(d).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",month:"numeric",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"});
 const localInput=d=>{const dt=new Date(d);const j=new Date(dt.toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));return new Date(j.getTime()-j.getTimezoneOffset()*60000).toISOString().slice(0,16)};
 const isLocked=(d,status="scheduled")=>new Date(d)<=new Date(state?.serverTime||Date.now())||status!=="scheduled";
+function timingMeta(d,status="scheduled"){
+  const target=new Date(d),now=new Date(state?.serverTime||Date.now()),ms=target-now;
+  if(status==="cancelled")return{cls:"time-cancelled",countdown:"開催なし",locked:true};
+  if(status==="final")return{cls:"time-closed",countdown:"試合終了",locked:true};
+  if(status!=="scheduled"||ms<=0)return{cls:"time-closed",countdown:"締切済み",locked:true};
+  const total=Math.max(0,Math.floor(ms/60000)),days=Math.floor(total/1440),hours=Math.floor((total%1440)/60),mins=total%60;
+  const countdown=days>0?`あと${days}日${hours}時間`:hours>0?`あと${hours}時間${mins}分`:`あと${mins}分`;
+  return{cls:total<=60?"time-urgent":total<=360?"time-soon":"time-open",countdown,locked:false};
+}
+function gameTimingPanel(d,status="scheduled"){
+  const t=timingMeta(d,status);
+  return `<div class="timing-panel ${t.cls}"><div class="timing-primary"><span>試合開始</span><b>${jst(d)}</b></div><div class="timing-secondary"><span>予想締切</span><strong>${jst(d)} <em>開始と同時</em></strong></div><div class="timing-countdown">${t.countdown}</div></div>`;
+}
+function seriesTimingPanel(d,status="scheduled"){
+  const t=timingMeta(d,status);
+  return `<div class="timing-panel series-timing ${t.cls}"><div class="timing-primary"><span>第1戦開始</span><b>${jst(d)}</b></div><div class="timing-secondary"><span>シリーズ予想締切</span><strong>${jst(d)} <em>第1戦開始と同時</em></strong></div><div class="timing-countdown">${t.countdown}</div></div>`;
+}
 function setBusy(v){busy=v;const e=document.getElementById("busy");if(e)e.classList.toggle("hidden",!v)}
 async function api(action,payload={}){
   const res=await fetch(API,{method:"POST",headers:{"content-type":"application/json","x-session-token":token},body:JSON.stringify({action,payload})});
