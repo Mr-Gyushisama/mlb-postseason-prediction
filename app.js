@@ -15,6 +15,9 @@ const ROUND_NAMES={WCS:"ワイルドカード",DS:"地区シリーズ",LCS:"リ�
 const AL_TEAMS=["NYY","BOS","TOR","BAL","TB","CLE","DET","MIN","CWS","KC","HOU","TEX","SEA","LAA","ATH"];
 const NL_TEAMS=["ATL","PHI","NYM","MIA","WSH","MIL","CHC","STL","CIN","PIT","LAD","SD","SF","ARI","COL"];
 const ALL_TEAMS=[...AL_TEAMS,...NL_TEAMS];
+const POSTSEASON_AL=["TB","CLE","HOU","NYY","BOS","CWS"];
+const POSTSEASON_NL=["MIL","LAD","ATL","SD","CHC","PHI"];
+const POSTSEASON_SEED={TB:1,CLE:2,HOU:3,NYY:4,BOS:5,CWS:6,MIL:1,LAD:2,ATL:3,SD:4,CHC:5,PHI:6};
 const esc=v=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const teamName=v=>TEAM_NAMES[String(v||"").toUpperCase()]||String(v||"");
 const teamCode=v=>String(v||"").toUpperCase();
@@ -429,20 +432,39 @@ function rankView(){
     </div>`).join("")}</div></section>`;
 }
 
+function postseasonFieldCard(){
+  const teamRow=(code,league)=>`<div class="postseason-team"><span class="seed-no">${POSTSEASON_SEED[code]}</span><div><b>${esc(teamName(code))}</b><small>${league} ${POSTSEASON_SEED[code]<=2?"1回戦免除":"ワイルドカード"}</small></div></div>`;
+  return `<section class="card postseason-field">
+    <div class="section-title"><div><div class="section-kicker">FINAL 12</div><h3>2026 ポストシーズン出場チーム</h3></div><span class="pill live">確定</span></div>
+    <div class="postseason-leagues">
+      <div><div class="league-head al">ア・リーグ</div>${POSTSEASON_AL.map(c=>teamRow(c,"AL")).join("")}</div>
+      <div><div class="league-head nl">ナ・リーグ</div>${POSTSEASON_NL.map(c=>teamRow(c,"NL")).join("")}</div>
+    </div>
+    <div class="bracket-next">
+      <b>地区シリーズの接続</b>
+      <span>レイズ ← ヤンキース／レッドソックス勝者</span>
+      <span>ガーディアンズ ← アストロズ／ホワイトソックス勝者</span>
+      <span>ブルワーズ ← パドレス／カブス勝者</span>
+      <span>ドジャース ← ブレーブス／フィリーズ勝者</span>
+    </div>
+  </section>`;
+}
+
 function preView(){
   const p=state.prePredictions.find(x=>x.actor_id===state.actor.id),lock=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime);
-  return viewTitle("大会前予想","ポストシーズン開始前に優勝チームを予想します。")+guideSteps(["AL・NL優勝","WS優勝","最終成績を保存"])+
+  return viewTitle("大会前予想","確定したポストシーズン12球団からリーグ優勝・ワールドシリーズ優勝を予想します。")+postseasonFieldCard()+guideSteps(["AL・NL優勝","WS優勝","最終成績を保存"])+
   `<section class="card glow pre-card"><div class="section-title"><div><div class="section-kicker">PRESEASON PICKS</div><h3>優勝予想</h3></div>${lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}</div>
   <div class="muted pre-deadline">締切：${jst(state.config.pre_lock_at)}</div>
   ${state.actor.role==="player"?`
   <div class="pre-pick-grid">
-    <div class="pre-pick-group"><span class="pre-league al">AL</span><label class="label">ア・リーグ優勝</label><select id="preAL" class="field" ${lock?"disabled":""}>${teamOptions(AL_TEAMS,p?.al_champion||"")}</select></div>
-    <div class="pre-pick-group"><span class="pre-league nl">NL</span><label class="label">ナ・リーグ優勝</label><select id="preNL" class="field" ${lock?"disabled":""}>${teamOptions(NL_TEAMS,p?.nl_champion||"")}</select></div>
-    <div class="pre-pick-group ws"><span class="pre-league ws">WS</span><label class="label">ワールドシリーズ優勝</label><select id="preWS" class="field" ${lock?"disabled":""}>${teamOptions(ALL_TEAMS,p?.ws_champion||"")}</select><label class="label">ワールドシリーズ最終成績</label><select id="preLW" class="field" ${lock?"disabled":""}>${[0,1,2,3].map(n=>`<option value="${n}" ${+p?.ws_loser_wins===n?"selected":""}>4-${n}</option>`).join("")}</select></div>
+    <div class="pre-pick-group"><span class="pre-league al">AL</span><label class="label">ア・リーグ優勝</label><select id="preAL" class="field" ${lock?"disabled":""}>${teamOptions(POSTSEASON_AL,p?.al_champion||"")}</select></div>
+    <div class="pre-pick-group"><span class="pre-league nl">NL</span><label class="label">ナ・リーグ優勝</label><select id="preNL" class="field" ${lock?"disabled":""}>${teamOptions(POSTSEASON_NL,p?.nl_champion||"")}</select></div>
+    <div class="pre-pick-group ws"><span class="pre-league ws">WS</span><label class="label">ワールドシリーズ優勝</label><select id="preWS" class="field" ${lock?"disabled":""}>${teamOptions([p?.al_champion,p?.nl_champion].filter(Boolean),p?.ws_champion||"")}</select><label class="label">ワールドシリーズ最終成績</label><select id="preLW" class="field" ${lock?"disabled":""}>${[0,1,2,3].map(n=>`<option value="${n}" ${+p?.ws_loser_wins===n?"selected":""}>4-${n}</option>`).join("")}</select></div>
   </div>
   ${lock?"":'<button id="savePre" class="btn danger pre-save">✓ 大会前予想を保存</button>'}
   `:''}</section>`;
 }
+
 function adminView(){
   if(state.actor.role!=="admin")return "";
   const names=state.players.map(p=>`<label class="label">${esc(p.id.toUpperCase())}</label><input class="field" id="nm_${p.id}" value="${esc(p.display_name)}">`).join("");
