@@ -2785,3 +2785,21 @@ body:before{
     font-size:12px;
   }
 }
+
+
+/* TIMING SINGLE-LINE v1 — 2026-09-29 */
+.timing-panel{grid-template-columns:1fr auto;align-items:center}
+.timing-primary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;grid-column:1}
+.timing-primary span{min-width:auto;font-size:9px;font-weight:950;color:#6d8398}
+.timing-primary b{font-size:15px;color:#102f4d}
+.timing-primary small{font-size:9px;font-weight:800;color:#7b8da0}
+.timing-secondary{display:none!important}
+.timing-countdown{grid-column:2;grid-row:1}
+@media(max-width:560px){
+  .timing-panel{grid-template-columns:1fr;gap:7px}
+  .timing-primary{grid-column:1;display:grid;grid-template-columns:auto 1fr;gap:3px 8px}
+  .timing-primary span{grid-column:1}
+  .timing-primary b{grid-column:2;font-size:14px}
+  .timing-primary small{grid-column:1/3;font-size:8px}
+  .timing-countdown{grid-column:1;grid-row:auto}
+}
