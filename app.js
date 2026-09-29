@@ -384,7 +384,8 @@ function gamesView(){
     else if(lock){cardState="game-missed";pill='<span class="pill missed">未予想で締切</span>'}
     else{cardState="game-unpredicted";pill='<span class="pill pending">● 未予想</span>'}
     out+=`<section class="card game-card ${cardState}">
-      <div class="status-line"><div class="muted">${esc(roundName(s?.round))} 第${g.game_no}戦 · ${jst(g.starts_at)}</div>${pill}</div>
+      <div class="status-line"><div class="muted">${esc(roundName(s?.round))} 第${g.game_no}戦</div>${pill}</div>
+      ${gameTimingPanel(g.starts_at,g.status)}
       ${matchupBlock(g.away_team,g.home_team)}
       ${g.status==="final"?`<div class="notice" style="text-align:center;font-weight:900">最終スコア　${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</div>`:""}
       ${g.status==="cancelled"?'<div class="notice cancelled-note">シリーズ決着により、この試合は開催されません。配分P・BOOSTは未使用へ戻ります。</div>':""}
@@ -426,7 +427,8 @@ function seriesView(){
       else if(!p&&!lock){cls+=" series-unpredicted";seriesPill='<span class="pill pending">● 未予想</span>'}
       else if(!p&&lock){cls+=" series-missed";seriesPill='<span class="pill missed">未予想で締切</span>'}
     }
-    return `<section class="card ${cls}"><div class="status-line"><div class="muted">${esc(roundName(s.round))} · 締切 ${jst(s.starts_at)}</div>${seriesPill}</div>
+    return `<section class="card ${cls}"><div class="status-line"><div class="muted">${esc(roundName(s.round))}</div>${seriesPill}</div>
+      ${seriesTimingPanel(s.starts_at,s.status)}
       ${matchupBlock(s.team_a,s.team_b)}
       ${s.status==="final"?`<div class="notice">${esc(teamName(s.winner_team))} 勝利 · ${s.wins_a}-${s.wins_b}</div>`:""}
       ${state.actor.role==="player"?`
