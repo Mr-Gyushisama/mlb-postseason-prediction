@@ -2678,3 +2678,110 @@ body:before{
   .postseason-team small{font-size:7px}
   .postseason-team .seed-no{width:22px;height:22px;flex-basis:22px;font-size:9px}
 }
+
+
+/* DEADLINE CLARITY v1 — 2026-09-29 */
+.timing-panel{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:6px 10px;
+  margin:9px 0 11px;
+  padding:11px 12px;
+  border-radius:14px;
+  border:1px solid #d8e6f1;
+  background:linear-gradient(180deg,rgba(250,253,255,.98),rgba(243,249,253,.96));
+  box-shadow:0 8px 22px rgba(20,55,90,.06);
+}
+.timing-primary,.timing-secondary{display:flex;align-items:center;gap:8px;min-width:0}
+.timing-primary{grid-column:1/2}
+.timing-secondary{grid-column:1/2}
+.timing-primary span,.timing-secondary span{
+  min-width:64px;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.04em;
+  color:#6d8398;
+}
+.timing-primary b{
+  font-size:15px;
+  line-height:1.1;
+  color:#102f4d;
+  white-space:nowrap;
+}
+.timing-secondary strong{
+  font-size:11px;
+  color:#344f69;
+  white-space:nowrap;
+}
+.timing-secondary em{
+  display:inline-block;
+  margin-left:4px;
+  padding:2px 5px;
+  border-radius:999px;
+  font-size:8px;
+  font-style:normal;
+  font-weight:900;
+  background:#e8f2fa;
+  color:#52708c;
+}
+.timing-countdown{
+  grid-column:2/3;
+  grid-row:1/3;
+  align-self:center;
+  min-width:88px;
+  padding:8px 10px;
+  border-radius:12px;
+  text-align:center;
+  font-size:13px;
+  font-weight:950;
+  color:#176db5;
+  background:#edf7ff;
+  border:1px solid #cae3f7;
+}
+.timing-panel.time-soon{
+  border-color:#f3d08c;
+  background:linear-gradient(180deg,#fffdf8,#fff8e9);
+}
+.timing-panel.time-soon .timing-countdown{
+  color:#9a6500;
+  background:#fff2cf;
+  border-color:#efd18d;
+}
+.timing-panel.time-urgent{
+  border-color:#efb2be;
+  background:linear-gradient(180deg,#fffafa,#fff0f3);
+  box-shadow:0 8px 24px rgba(190,50,76,.10);
+}
+.timing-panel.time-urgent .timing-countdown{
+  color:#b32642;
+  background:#ffe5ea;
+  border-color:#efb1bd;
+  animation:deadlinePulse 1.6s ease-in-out infinite;
+}
+.timing-panel.time-closed,.timing-panel.time-cancelled{
+  border-color:#d8e1e9;
+  background:#f3f6f8;
+}
+.timing-panel.time-closed .timing-countdown,
+.timing-panel.time-cancelled .timing-countdown{
+  color:#65798c;
+  background:#e7edf2;
+  border-color:#d3dde6;
+}
+@keyframes deadlinePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+
+@media(max-width:560px){
+  .timing-panel{grid-template-columns:1fr;gap:5px;padding:10px}
+  .timing-primary,.timing-secondary{grid-column:1}
+  .timing-primary b{font-size:14px}
+  .timing-secondary strong{font-size:10px}
+  .timing-countdown{
+    grid-column:1;
+    grid-row:auto;
+    min-width:0;
+    width:100%;
+    padding:7px 9px;
+    font-size:12px;
+  }
+}
