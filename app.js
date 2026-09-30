@@ -458,7 +458,7 @@ function seriesView(){
 function rankView(){
   const prePublic=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime||Date.now());
   return viewTitle("順位表",prePublic?"順位・勝敗・各プレイヤーの優勝予想を確認できます。":"優勝予想は大会前予想の締切後に一斉公開されます。")+
-  `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>{
+  `<section class="card glow rank-card"><div class="rank-list">${state.ranking.map((x,i)=>{
     const p=state.prePredictions.find(v=>v.actor_id===x.player.id);
     const picks=prePublic
       ? (p
