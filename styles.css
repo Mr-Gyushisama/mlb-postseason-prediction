@@ -3562,3 +3562,40 @@ body:before{
     display:none;
   }
 }
+
+
+/* RANK STATUS CLARITY v4 — 2026-10-01 */
+/* Keep the ranking hierarchy intact while clarifying unresolved bets,
+   remaining allocation points, and the signed-in player's own row. */
+.rank-card .record-pending{
+  background:#f5f7f9;
+  border-color:#dfe5eb;
+  color:#687b8e;
+}
+.rank-card .rank-row.rank-self{
+  outline:2px solid rgba(39,126,197,.28);
+  outline-offset:-2px;
+}
+.rank-card .rank-row.rank-self .rank-main>b:after{
+  content:"あなた";
+  display:inline-flex;
+  align-items:center;
+  margin-left:6px;
+  padding:2px 5px;
+  border-radius:999px;
+  background:#eaf5ff;
+  border:1px solid #c9e2f6;
+  color:#2f6f9f;
+  font-size:7.5px;
+  line-height:1.2;
+  font-weight:900;
+  vertical-align:2px;
+  white-space:nowrap;
+}
+@media(max-width:560px){
+  .rank-card .rank-row.rank-self .rank-main>b:after{
+    margin-left:5px;
+    padding:2px 4px;
+    font-size:7px;
+  }
+}

@@ -465,13 +465,15 @@ function rankView(){
         ? `<div class="rank-picks"><span class="pick-label">優勝予想</span><span class="pick-ws"><em>WS</em><strong>${esc(teamName(p.ws_champion))}</strong></span><span class="pick-al"><em>AL</em>${esc(teamName(p.al_champion))}</span><span class="pick-nl"><em>NL</em>${esc(teamName(p.nl_champion))}</span></div>`
         : '<div class="rank-picks no-pick"><span class="pick-label">優勝予想</span><span>未登録</span></div>')
       : '<div class="rank-picks locked-pick"><span class="pick-label">優勝予想</span><span>締切後に公開</span></div>';
-    return `<div class="rank-row rank-${i+1}">
+    const pendingGames=Math.max(0,(x.betGames??0)-(x.settledGames??0));
+    const isSelf=state.actor?.id===x.player.id;
+    return `<div class="rank-row rank-${i+1}${isSelf?" rank-self":""}">
       <div class="rank-no">${i+1}</div>
       <div class="rank-main">
         <b>${esc(x.player.display_name)}</b>
-        <div class="rank-record"><span class="record-bet">ベット <strong>${x.betGames??0}</strong>試合</span><span class="record-win"><strong>${x.wins??0}</strong>勝</span><span class="record-loss"><strong>${x.losses??0}</strong>敗</span><span class="record-rate">的中率 ${x.settledGames?Math.round(((x.wins??0)/x.settledGames)*100):0}%</span></div>
+        <div class="rank-record"><span class="record-bet">ベット <strong>${x.betGames??0}</strong>試合</span><span class="record-win"><strong>${x.wins??0}</strong>勝</span><span class="record-loss"><strong>${x.losses??0}</strong>敗</span><span class="record-pending"><strong>${pendingGames}</strong>未決</span><span class="record-rate">的中率 ${x.settledGames?Math.round(((x.wins??0)/x.settledGames)*100):0}%</span></div>
         ${picks}
-        <div class="rank-meta"><span>試合 ${x.game}P</span><span>シリーズ ${x.series}P</span><span>大会前 ${x.pre}P</span><span>残り ${x.remaining}P</span></div>
+        <div class="rank-meta"><span>試合 ${x.game}P</span><span>シリーズ ${x.series}P</span><span>大会前 ${x.pre}P</span><span>残り配分 ${x.remaining}P</span></div>
       </div>
       <div class="rank-score">${x.total}P</div>
     </div>`;
