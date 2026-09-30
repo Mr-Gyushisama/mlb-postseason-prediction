@@ -2803,3 +2803,94 @@ body:before{
   .timing-primary small{grid-column:1/3;font-size:8px}
   .timing-countdown{grid-column:1;grid-row:auto}
 }
+
+
+/* RANK RECORDS AND HIT RESULTS v1 — 2026-09-30 */
+.rank-main{min-width:0}
+.rank-record{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:5px 0 4px;
+}
+.rank-record span{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:850;
+  border:1px solid #dbe6ef;
+  background:#f6f9fc;
+  color:#5d7186;
+}
+.rank-record strong{font-size:11px}
+.rank-record .record-win{background:#edf9f1;border-color:#c8e9d1;color:#207043}
+.rank-record .record-loss{background:#fff1f3;border-color:#efc9d1;color:#a63149}
+.rank-record .record-bet{background:#edf6ff;border-color:#c9e0f4;color:#27699e}
+.rank-record .record-rate{background:#f4f1ff;border-color:#ddd4f6;color:#6550a3}
+
+.prediction-result{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:9px 0;
+  padding:10px 12px;
+  border-radius:13px;
+  border:1px solid;
+  font-weight:900;
+}
+.prediction-result div{display:flex;flex-direction:column;gap:1px}
+.prediction-result span{font-size:13px}
+.prediction-result small{font-size:9px;font-weight:750;opacity:.78}
+.prediction-result b{font-size:18px;white-space:nowrap}
+.prediction-result.result-hit{
+  background:linear-gradient(180deg,#effbf3,#e7f7ed);
+  border-color:#bce2c7;
+  color:#1d7040;
+}
+.prediction-result.result-exact{
+  background:linear-gradient(180deg,#fffaf0,#fff2cf);
+  border-color:#edcf7c;
+  color:#8a5d00;
+  box-shadow:0 8px 20px rgba(190,135,20,.10);
+}
+.prediction-result.result-miss{
+  background:linear-gradient(180deg,#fff5f6,#ffedef);
+  border-color:#efc4cc;
+  color:#a43a4f;
+}
+.pill.result-hit{
+  background:#eaf8ef!important;
+  border-color:#bfe2ca!important;
+  color:#1f7443!important;
+}
+.pill.result-exact{
+  background:#fff3d3!important;
+  border-color:#e9ca73!important;
+  color:#865b00!important;
+}
+.pill.result-miss{
+  background:#ffedf0!important;
+  border-color:#edc2ca!important;
+  color:#a43a4f!important;
+}
+.game-card.result-hit{border-color:#bce2c7!important}
+.game-card.result-exact{
+  border-color:#edcf7c!important;
+  box-shadow:0 10px 28px rgba(190,135,20,.11)!important;
+}
+.game-card.result-miss{border-color:#efc4cc!important}
+.game-card.result-hit:after{background:linear-gradient(90deg,#35a868,#73c894)!important}
+.game-card.result-exact:after{background:linear-gradient(90deg,#d8a52f,#f0ca6a)!important}
+.game-card.result-miss:after{background:linear-gradient(90deg,#d75b70,#ef9aaa)!important}
+
+@media(max-width:560px){
+  .rank-record{gap:4px}
+  .rank-record span{padding:3px 6px;font-size:8px}
+  .rank-record strong{font-size:10px}
+  .prediction-result{padding:9px 10px}
+  .prediction-result b{font-size:16px}
+}
