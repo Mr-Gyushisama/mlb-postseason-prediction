@@ -442,11 +442,11 @@ function seriesView(){
   }).join("");
 }
 function rankView(){
-  return viewTitle("順位表","試合結果が確定すると自動で採点され、順位が更新されます。")+
+  return viewTitle("順位表","得点だけでなく、ベット試合数と勝敗も確認できます。")+
   `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>`
     <div class="rank-row rank-${i+1}">
       <div class="rank-no">${i+1}</div>
-      <div><b>${esc(x.player.display_name)}</b><div class="rank-meta"><span>試合 ${x.game}</span><span>シリーズ ${x.series}</span><span>大会前 ${x.pre}</span><span>残り ${x.remaining}P</span></div></div>
+      <div class="rank-main"><b>${esc(x.player.display_name)}</b><div class="rank-record"><span class="record-bet">ベット <strong>${x.betGames??0}</strong>試合</span><span class="record-win"><strong>${x.wins??0}</strong>勝</span><span class="record-loss"><strong>${x.losses??0}</strong>敗</span><span class="record-rate">的中率 ${x.settledGames?Math.round(((x.wins??0)/x.settledGames)*100):0}%</span></div><div class="rank-meta"><span>試合 ${x.game}P</span><span>シリーズ ${x.series}P</span><span>大会前 ${x.pre}P</span><span>残り ${x.remaining}P</span></div></div>
       <div class="rank-score">${x.total}P</div>
     </div>`).join("")}</div></section>`;
 }
