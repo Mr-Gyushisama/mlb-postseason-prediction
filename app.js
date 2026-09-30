@@ -360,6 +360,20 @@ function matchupBlock(away,home){
   </div>`;
 }
 
+function gamePredictionResult(g,p){
+  if(!p||g.status!=="final")return null;
+  const actualAway=Number(g.away_score),actualHome=Number(g.home_score);
+  const predAway=Number(p.away_score),predHome=Number(p.home_score);
+  const winHit=(actualAway>actualHome)===(predAway>predHome);
+  const exact=predAway===actualAway&&predHome===actualHome;
+  const oneSide=winHit&&!exact&&(predAway===actualAway||predHome===actualHome);
+  const pts=Number(p.points_awarded||0);
+  if(exact)return{cls:"result-exact",label:"★ 完全的中",sub:"勝敗＋スコア完全一致",pts};
+  if(oneSide)return{cls:"result-hit",label:"✓ 的中",sub:"勝敗＋片方の得点一致",pts};
+  if(winHit)return{cls:"result-hit",label:"✓ 的中",sub:"勝敗的中",pts};
+  return{cls:"result-miss",label:"× ハズレ",sub:"勝敗不的中",pts};
+}
+
 function gamesView(){
   const mine=state.gamePredictions.filter(x=>x.actor_id===state.actor.id);
   const open=state.games.filter(g=>g.status!=="cancelled"&&!isLocked(g.starts_at,g.status));
@@ -374,9 +388,9 @@ function gamesView(){
   });
   let out=viewTitle("試合予想","未予想の試合を上に表示しています。")+guideSteps(["予想スコアを入力","上限内でPを配分","BOOSTを選んで保存"])+(state.actor.role==="player"?`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>${predicted}</b></div><div class="status-count"><span>受付中</span><b>${open.length}</b></div></div>`:"")+budgetCard();
   for(const g of ordered){
-    const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status),stakeMax=state.stakeMaxByRound?.[s?.round]??10;
+    const s=state.series.find(x=>x.id===g.series_id),p=state.gamePredictions.find(x=>x.game_id===g.id&&x.actor_id===state.actor.id),lock=isLocked(g.starts_at,g.status),stakeMax=state.stakeMaxByRound?.[s?.round]??10,result=gamePredictionResult(g,p);
     let cardState="game-neutral",pill="";
-    if(g.status==="final"){cardState="game-final";pill='<span class="pill final">試合終了</span>'}
+    if(g.status==="final"){cardState="game-final "+(result?.cls||"");pill=result?`<span class="pill ${result.cls}">${result.label}</span>`:'<span class="pill final">試合終了</span>'}
     else if(g.status==="cancelled"){cardState="game-cancelled";pill='<span class="pill cancelled">開催なし</span>'}
     else if(state.actor.role!=="player"){cardState=lock?"game-locked":"game-neutral";pill=lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>'}
     else if(p&&lock){cardState="game-predicted game-locked";pill='<span class="pill predicted">✓ 予想済・締切</span>'}
@@ -387,7 +401,7 @@ function gamesView(){
       <div class="status-line"><div class="muted">${esc(roundName(s?.round))} 第${g.game_no}戦</div>${pill}</div>
       ${gameTimingPanel(g.starts_at,g.status)}
       ${matchupBlock(g.away_team,g.home_team)}
-      ${g.status==="final"?`<div class="notice" style="text-align:center;font-weight:900">最終スコア　${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</div>`:""}
+      ${g.status==="final"?`<div class="notice" style="text-align:center;font-weight:900">最終スコア　${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</div>`:""}\n      ${result?`<div class="prediction-result ${result.cls}"><div><span>${result.label}</span><small>${result.sub}</small></div><b>+${result.pts}P</b></div>`:""}
       ${g.status==="cancelled"?'<div class="notice cancelled-note">シリーズ決着により、この試合は開催されません。配分P・BOOSTは未使用へ戻ります。</div>':""}
       ${state.actor.role==="player"&&g.status!=="cancelled"?`
       <div class="score-grid">
