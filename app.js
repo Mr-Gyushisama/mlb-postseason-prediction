@@ -456,13 +456,26 @@ function seriesView(){
   }).join("");
 }
 function rankView(){
-  return viewTitle("順位表","得点だけでなく、ベット試合数と勝敗も確認できます。")+
-  `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>`
-    <div class="rank-row rank-${i+1}">
+  const prePublic=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime||Date.now());
+  return viewTitle("順位表",prePublic?"順位・勝敗・各プレイヤーの優勝予想を確認できます。":"優勝予想は大会前予想の締切後に一斉公開されます。")+
+  `<section class="card glow"><div class="rank-list">${state.ranking.map((x,i)=>{
+    const p=state.prePredictions.find(v=>v.actor_id===x.player.id);
+    const picks=prePublic
+      ? (p
+        ? `<div class="rank-picks"><span class="pick-label">優勝予想</span><span class="pick-ws"><em>WS</em><strong>${esc(teamName(p.ws_champion))}</strong></span><span class="pick-al"><em>AL</em>${esc(teamName(p.al_champion))}</span><span class="pick-nl"><em>NL</em>${esc(teamName(p.nl_champion))}</span></div>`
+        : '<div class="rank-picks no-pick"><span class="pick-label">優勝予想</span><span>未登録</span></div>')
+      : '<div class="rank-picks locked-pick"><span class="pick-label">優勝予想</span><span>締切後に公開</span></div>';
+    return `<div class="rank-row rank-${i+1}">
       <div class="rank-no">${i+1}</div>
-      <div class="rank-main"><b>${esc(x.player.display_name)}</b><div class="rank-record"><span class="record-bet">ベット <strong>${x.betGames??0}</strong>試合</span><span class="record-win"><strong>${x.wins??0}</strong>勝</span><span class="record-loss"><strong>${x.losses??0}</strong>敗</span><span class="record-rate">的中率 ${x.settledGames?Math.round(((x.wins??0)/x.settledGames)*100):0}%</span></div><div class="rank-meta"><span>試合 ${x.game}P</span><span>シリーズ ${x.series}P</span><span>大会前 ${x.pre}P</span><span>残り ${x.remaining}P</span></div></div>
+      <div class="rank-main">
+        <b>${esc(x.player.display_name)}</b>
+        <div class="rank-record"><span class="record-bet">ベット <strong>${x.betGames??0}</strong>試合</span><span class="record-win"><strong>${x.wins??0}</strong>勝</span><span class="record-loss"><strong>${x.losses??0}</strong>敗</span><span class="record-rate">的中率 ${x.settledGames?Math.round(((x.wins??0)/x.settledGames)*100):0}%</span></div>
+        ${picks}
+        <div class="rank-meta"><span>試合 ${x.game}P</span><span>シリーズ ${x.series}P</span><span>大会前 ${x.pre}P</span><span>残り ${x.remaining}P</span></div>
+      </div>
       <div class="rank-score">${x.total}P</div>
-    </div>`).join("")}</div></section>`;
+    </div>`;
+  }).join("")}</div></section>`;
 }
 
 function postseasonFieldCard(){
