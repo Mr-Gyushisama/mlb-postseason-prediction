@@ -2965,3 +2965,376 @@ body:before{
   .rank-picks span:not(.pick-label){font-size:8px;padding:3px 5px}
   .rank-picks .pick-ws strong{font-size:10px}
 }
+
+/* RANK COMPACT UI v2 — 2026-09-30 */
+.rank-card{
+  padding:9px 10px!important;
+}
+.rank-card .rank-list{
+  gap:6px!important;
+}
+.rank-card .rank-row{
+  grid-template-columns:28px minmax(0,1fr) auto;
+  gap:7px;
+  align-items:start;
+  padding:8px 9px!important;
+  border-radius:12px;
+}
+.rank-card .rank-main{
+  min-width:0;
+}
+.rank-card .rank-main>b{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#10233f;
+  font-size:14px;
+  line-height:1.15;
+  letter-spacing:-.01em;
+}
+.rank-card .rank-no{
+  align-self:start;
+  padding-top:1px;
+  font-size:18px!important;
+  line-height:1;
+  color:#5f7388;
+}
+.rank-card .rank-score{
+  align-self:start;
+  padding-top:0;
+  font-size:20px!important;
+  line-height:1;
+  white-space:nowrap;
+  letter-spacing:-.035em;
+  color:#17324d;
+}
+.rank-card .rank-row.rank-1{
+  border-color:rgba(213,171,66,.55)!important;
+}
+.rank-card .rank-row.rank-1 .rank-no,
+.rank-card .rank-row.rank-1 .rank-score{
+  color:#b87908!important;
+}
+.rank-card .rank-row.rank-2,
+.rank-card .rank-row.rank-3{
+  border-color:rgba(194,208,222,.72)!important;
+}
+.rank-card .rank-row.rank-2:before,
+.rank-card .rank-row.rank-3:before{
+  background:#d6e0e9;
+}
+.rank-card .rank-record{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px 4px;
+  margin:4px 0 3px;
+}
+.rank-card .rank-record span{
+  gap:2px;
+  padding:2px 5px;
+  border-radius:999px;
+  font-size:8.5px;
+  line-height:1.25;
+  font-weight:800;
+  box-shadow:none;
+}
+.rank-card .rank-record strong{
+  font-size:10px;
+  line-height:1;
+}
+.rank-card .record-bet{
+  background:#eef6fd;
+  border-color:#d2e3f1;
+  color:#356f9d;
+}
+.rank-card .record-win{
+  background:#eff8f2;
+  border-color:#d2ead9;
+  color:#357451;
+}
+.rank-card .record-loss{
+  background:#fff2f4;
+  border-color:#efd5da;
+  color:#9a4a59;
+}
+.rank-card .record-rate{
+  background:#f3f2fa;
+  border-color:#dfdced;
+  color:#625b8b;
+}
+.rank-card .rank-picks{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:3px 4px;
+  margin:2px 0 3px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+.rank-card .rank-picks .pick-label{
+  display:none;
+}
+.rank-card .rank-picks span:not(.pick-label){
+  gap:3px;
+  padding:2px 5px;
+  border-radius:999px;
+  font-size:8.5px;
+  line-height:1.25;
+  font-weight:800;
+  box-shadow:none;
+}
+.rank-card .rank-picks em{
+  font-size:7px;
+  line-height:1;
+  letter-spacing:.04em;
+}
+.rank-card .rank-picks .pick-ws{
+  order:0;
+  padding:3px 6px!important;
+  background:#fff6dd!important;
+  border-color:#e8cf8b!important;
+  color:#79570b!important;
+  box-shadow:none;
+}
+.rank-card .rank-picks .pick-ws strong{
+  font-size:10px;
+  line-height:1;
+  color:#79570b;
+}
+.rank-card .rank-picks .pick-al{
+  background:#eef7fd!important;
+  border-color:#d0e4f1!important;
+  color:#356e96!important;
+}
+.rank-card .rank-picks .pick-nl{
+  background:#fff2f5!important;
+  border-color:#efd6dc!important;
+  color:#9a5060!important;
+}
+.rank-card .rank-picks.locked-pick,
+.rank-card .rank-picks.no-pick{
+  min-height:18px;
+  margin:2px 0 3px;
+  padding:0;
+  background:transparent;
+  color:#7a8998;
+}
+.rank-card .rank-picks.locked-pick span:last-child,
+.rank-card .rank-picks.no-pick span:last-child{
+  padding:1px 0;
+  font-size:8.5px;
+}
+.rank-card .rank-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:2px 10px;
+  margin-top:1px;
+  color:#7e8fa0;
+  font-size:8.5px;
+  line-height:1.25;
+}
+.rank-card .rank-meta span{
+  white-space:nowrap;
+}
+
+/* Compact shared header */
+.topbar{
+  padding:9px 10px 8px!important;
+}
+.topbar-row{
+  gap:8px;
+}
+.header-brand{
+  min-width:0;
+  gap:7px;
+}
+.header-mark{
+  width:30px!important;
+  height:22px!important;
+  border-radius:6px!important;
+  font-size:11px!important;
+}
+.glass-topbar .header-copy{
+  min-width:0;
+}
+.glass-topbar .eyebrow{
+  font-size:7.5px!important;
+  line-height:1.1;
+  letter-spacing:.07em;
+  white-space:nowrap;
+}
+.glass-topbar h2{
+  max-width:150px;
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px!important;
+  line-height:1.05;
+}
+.header-actions{
+  flex:0 0 auto;
+  gap:5px;
+}
+.glass-topbar .header-notify{
+  min-width:62px!important;
+  width:auto!important;
+  height:36px!important;
+  min-height:36px!important;
+  padding:0 7px!important;
+  border-radius:10px!important;
+}
+.glass-topbar .header-clear{
+  height:36px!important;
+  min-height:36px!important;
+  padding:0 7px!important;
+  border-radius:10px!important;
+  font-size:8.5px!important;
+}
+.glass-topbar .btn.ghost.small{
+  min-height:36px!important;
+  padding:6px 8px!important;
+  border-radius:10px!important;
+  font-size:10px!important;
+}
+
+/* Compact shared bottom navigation; preserve iPhone safe area */
+.shell{
+  padding-bottom:calc(74px + env(safe-area-inset-bottom))!important;
+}
+.nav{
+  height:calc(58px + env(safe-area-inset-bottom))!important;
+  padding-bottom:env(safe-area-inset-bottom)!important;
+}
+.nav button{
+  min-height:54px!important;
+  font-size:8px!important;
+}
+.nav-icon{
+  height:17px!important;
+  line-height:17px!important;
+}
+.nav-icon svg{
+  width:18px!important;
+  height:18px!important;
+}
+.nav-label{
+  font-size:8px!important;
+}
+.glass-nav button.active{
+  padding:4px 2px!important;
+  border-radius:12px;
+  background-clip:content-box!important;
+}
+.glass-nav button.active:before{
+  top:4px;
+  left:31%;
+  right:31%;
+  height:2px;
+}
+.nav-badge{
+  top:4px!important;
+}
+
+@media(max-width:560px){
+  .rank-card{
+    padding:7px 8px!important;
+  }
+  .rank-card .rank-list{
+    gap:5px!important;
+  }
+  .rank-card .rank-row{
+    grid-template-columns:25px minmax(0,1fr) auto;
+    gap:6px;
+    padding:7px 7px!important;
+  }
+  .rank-card .rank-main>b{
+    font-size:13.5px;
+  }
+  .rank-card .rank-no{
+    font-size:16px!important;
+    padding-top:2px;
+  }
+  .rank-card .rank-score{
+    font-size:18px!important;
+  }
+  .rank-card .rank-record{
+    gap:3px;
+    margin:3px 0 2px;
+  }
+  .rank-card .rank-record span{
+    padding:2px 4px;
+    font-size:8px;
+  }
+  .rank-card .rank-record strong{
+    font-size:9.5px;
+  }
+  .rank-card .rank-picks{
+    gap:3px;
+    margin:2px 0;
+  }
+  .rank-card .rank-picks span:not(.pick-label){
+    padding:2px 4px;
+    font-size:8px;
+  }
+  .rank-card .rank-picks .pick-ws{
+    padding:2px 5px!important;
+  }
+  .rank-card .rank-picks .pick-ws strong{
+    font-size:9.5px;
+  }
+  .rank-card .rank-meta{
+    gap:2px 8px;
+    font-size:8px;
+  }
+  .topbar{
+    padding:8px 9px 7px!important;
+  }
+  .header-mark{
+    width:28px!important;
+    height:21px!important;
+    font-size:10px!important;
+  }
+  .glass-topbar h2{
+    max-width:118px;
+    font-size:13px!important;
+  }
+  .glass-topbar .eyebrow{
+    font-size:7px!important;
+  }
+  .glass-topbar .header-notify{
+    min-width:58px!important;
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 6px!important;
+  }
+  .glass-topbar .header-clear{
+    height:34px!important;
+    min-height:34px!important;
+    padding:0 6px!important;
+    font-size:8px!important;
+  }
+  .glass-topbar .btn.ghost.small{
+    min-height:34px!important;
+    padding:5px 7px!important;
+    font-size:9px!important;
+  }
+  .nav{
+    height:calc(56px + env(safe-area-inset-bottom))!important;
+  }
+  .nav button{
+    min-height:52px!important;
+  }
+  .nav-icon svg{
+    width:17px!important;
+    height:17px!important;
+  }
+  .nav-label{
+    font-size:7.5px!important;
+  }
+}
+
