@@ -2894,3 +2894,74 @@ body:before{
   .prediction-result{padding:9px 10px}
   .prediction-result b{font-size:16px}
 }
+
+
+/* RANK CHAMPION PICKS v1 — 2026-09-30 */
+.rank-picks{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:5px;
+  margin:7px 0 6px;
+  padding:7px 8px;
+  border-radius:11px;
+  background:linear-gradient(180deg,#f8fbfe,#f2f7fb);
+  border:1px solid #dbe6ef;
+}
+.rank-picks .pick-label{
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:.05em;
+  color:#71869a;
+  margin-right:2px;
+}
+.rank-picks span:not(.pick-label){
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:3px 6px;
+  border-radius:999px;
+  font-size:9px;
+  font-weight:850;
+  color:#516b83;
+  background:#fff;
+  border:1px solid #dde7ef;
+}
+.rank-picks em{
+  font-size:7px;
+  font-style:normal;
+  font-weight:950;
+  letter-spacing:.06em;
+  color:#7790a8;
+}
+.rank-picks .pick-ws{
+  order:-1;
+  padding:5px 8px!important;
+  background:linear-gradient(180deg,#fff7df,#ffedbb)!important;
+  border-color:#e7c76c!important;
+  color:#765000!important;
+  box-shadow:0 4px 12px rgba(170,120,15,.08);
+}
+.rank-picks .pick-ws strong{
+  font-size:11px;
+  color:#765000;
+}
+.rank-picks .pick-ws em{color:#9d730e}
+.rank-picks .pick-al{background:#eef7ff!important;border-color:#c8e0f2!important;color:#246795!important}
+.rank-picks .pick-nl{background:#fff1f4!important;border-color:#efccd4!important;color:#a53d55!important}
+.rank-picks.locked-pick,.rank-picks.no-pick{
+  justify-content:flex-start;
+  background:#f4f6f8;
+  color:#7a8998;
+}
+.rank-picks.locked-pick span:last-child,.rank-picks.no-pick span:last-child{
+  background:transparent;
+  border:0;
+  padding:0;
+  color:#7a8998;
+}
+@media(max-width:560px){
+  .rank-picks{gap:4px;padding:6px 7px}
+  .rank-picks span:not(.pick-label){font-size:8px;padding:3px 5px}
+  .rank-picks .pick-ws strong{font-size:10px}
+}
