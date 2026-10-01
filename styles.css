@@ -3599,3 +3599,95 @@ body:before{
     font-size:7px;
   }
 }
+
+
+/* GAME STATUS / SCORE BREAKDOWN v1 — 2026-10-01 */
+.game-section-head{
+  display:flex;align-items:end;justify-content:space-between;gap:10px;
+  margin:18px 2px 8px;padding:0 2px 7px;border-bottom:1px solid #dfe7ee;
+}
+.game-section-head>div{display:flex;flex-direction:column;gap:1px}
+.game-section-head b{font-size:14px;color:#17324d}
+.game-section-head small{font-size:9px;color:#7c8fa1;font-weight:750}
+.game-section-head>span{
+  flex:0 0 auto;padding:3px 7px;border-radius:999px;
+  background:#eef4f8;border:1px solid #dbe6ee;color:#647b90;
+  font-size:8.5px;font-weight:900;
+}
+.game-section-head.active-games{
+  border-bottom-color:#b8dcf5;
+}
+.game-section-head.active-games b{color:#17689e}
+.game-section-head.finished-games{
+  margin-top:22px;border-bottom-color:#d7dde3;
+}
+.game-section-head.finished-games b{color:#53677a}
+.game-card.game-live{
+  border-color:#8fcdf4!important;
+  box-shadow:0 10px 28px rgba(26,132,205,.10)!important;
+}
+.game-card.game-waiting{
+  border-color:#c5dceb!important;
+  background:linear-gradient(180deg,#f8fbfe,#f2f7fb)!important;
+}
+.game-card.game-final{
+  border-color:#d8e0e7!important;
+  background:linear-gradient(180deg,#f7f9fb,#f1f4f7)!important;
+  box-shadow:none!important;
+}
+.game-card.game-final .matchup{opacity:.9}
+.game-card.game-postponed{
+  border-color:#e5d7b4!important;
+  background:#fffaf1!important;
+}
+.pill.waiting{background:#eaf5fc!important;border-color:#c9e2f2!important;color:#2d739f!important}
+.pill.postponed{background:#fff4d8!important;border-color:#ecd69c!important;color:#8b6818!important}
+.game-live-pill{animation:liveSoftPulse 1.8s ease-in-out infinite}
+@keyframes liveSoftPulse{0%,100%{box-shadow:0 0 0 rgba(32,145,215,0)}50%{box-shadow:0 0 0 5px rgba(32,145,215,.10)}}
+.game-date-line{
+  margin:6px 0 8px;font-size:9px;font-weight:800;color:#7b8ea0;
+}
+.final-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:9px 0 7px;padding:10px 11px;border-radius:12px;
+  background:#eef3f7;border:1px solid #d9e2e9;
+}
+.final-score span{font-size:8px;font-weight:950;letter-spacing:.08em;color:#687d90}
+.final-score b{font-size:13px;color:#1a354e;text-align:right}
+.final-prediction,.locked-prediction{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:7px 0;padding:8px 10px;border-radius:10px;
+  background:#fff;border:1px solid #dfe7ed;
+}
+.final-prediction span,.locked-prediction span{font-size:8.5px;font-weight:850;color:#7b8d9d}
+.final-prediction b,.locked-prediction b{font-size:10px;color:#29455f;text-align:right}
+.final-prediction.no-entry,.locked-prediction.no-entry{background:#f7f8f9}
+.final-prediction.no-entry b,.locked-prediction.no-entry b{color:#8d9aa6}
+.points-breakdown{
+  margin:8px 0 4px;padding:9px 10px;border-radius:12px;
+  background:#f8fbfd;border:1px solid #dbe6ee;
+}
+.points-breakdown-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding-bottom:6px;margin-bottom:5px;border-bottom:1px solid #e4ebf0;
+}
+.points-breakdown-head span{font-size:9px;font-weight:950;color:#526f87}
+.points-breakdown-head b{font-size:15px;color:#1f7443}
+.points-breakdown-grid{display:grid;gap:4px}
+.points-breakdown-grid>div{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.points-breakdown-grid span{font-size:8.5px;color:#74889a;font-weight:800}
+.points-breakdown-grid b{font-size:9.5px;color:#29485f;white-space:nowrap}
+.points-breakdown.has-warning{border-color:#e9cf92;background:#fffaf0}
+.points-breakdown-warning{
+  margin-top:7px;padding-top:6px;border-top:1px solid #eadcb8;
+  color:#8a6819;font-size:8px;line-height:1.45;font-weight:750;
+}
+.postponed-note{background:#fff7e5!important;border-color:#ecd9a9!important;color:#7f641f!important}
+@media(max-width:560px){
+  .game-section-head{margin-top:15px}
+  .game-section-head b{font-size:13px}
+  .final-score{align-items:flex-start;flex-direction:column;gap:3px}
+  .final-score b{text-align:left;font-size:12px}
+  .final-prediction,.locked-prediction{align-items:flex-start;flex-direction:column;gap:2px}
+  .final-prediction b,.locked-prediction b{text-align:left}
+}
