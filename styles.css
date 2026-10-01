@@ -3714,3 +3714,49 @@ body:before{
   .series-tab span{font-size:10.5px}
   .series-tab small{font-size:6.8px}
 }
+
+
+/* SERIES POINT BREAKDOWN v1 — 2026-10-01 */
+.series-point-rule{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:5px 7px;
+  margin:8px 0;
+  padding:7px 9px;
+  border:1px solid #dfe8ef;
+  border-radius:10px;
+  background:#f7fafc;
+}
+.series-point-rule span{
+  font-size:8px;
+  font-weight:950;
+  color:#6a8093;
+}
+.series-point-rule b{
+  padding:2px 6px;
+  border-radius:999px;
+  background:#eef5fa;
+  color:#315b7a;
+  font-size:8.5px;
+  font-weight:900;
+}
+.series-point-rule em{
+  padding:2px 6px;
+  border-radius:999px;
+  background:#fff4dc;
+  color:#8a691e;
+  font-size:8.5px;
+  font-style:normal;
+  font-weight:900;
+}
+.series-result-block{
+  margin-top:7px;
+}
+.series-result-block .prediction-result{
+  margin-bottom:7px;
+}
+@media(max-width:560px){
+  .series-point-rule{gap:4px 5px;padding:7px 8px}
+  .series-point-rule b,.series-point-rule em{font-size:8px}
+}

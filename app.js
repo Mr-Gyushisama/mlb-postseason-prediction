@@ -534,6 +534,58 @@ function gamesView(){
   }
   return out;
 }
+function seriesPredictionResult(s,p){
+  if(!p||s.status!=="final")return null;
+  const q=state.config?.series_points?.[s.round]||{};
+  const winnerHit=String(p.winner_team||"").toUpperCase()===String(s.winner_team||"").toUpperCase();
+  const actualWinnerWins=String(s.winner_team||"").toUpperCase()===String(s.team_a||"").toUpperCase()?Number(s.wins_a):Number(s.wins_b);
+  const actualLoserWins=String(s.winner_team||"").toUpperCase()===String(s.team_a||"").toUpperCase()?Number(s.wins_b):Number(s.wins_a);
+  const exact=winnerHit&&Number(p.winner_wins)===actualWinnerWins&&Number(p.loser_wins)===actualLoserWins;
+  const winnerBase=winnerHit?Number(q.winner||0):0;
+  const exactBonus=exact?Number(q.exact||0):0;
+  let upsetApplied=false;
+  if(winnerHit&&p.upset){
+    const predictedIsA=String(p.winner_team||"").toUpperCase()===String(s.team_a||"").toUpperCase();
+    const predictedSeed=Number(predictedIsA?s.seed_a:s.seed_b);
+    const opponentSeed=Number(predictedIsA?s.seed_b:s.seed_a);
+    upsetApplied=Number.isFinite(predictedSeed)&&Number.isFinite(opponentSeed)&&predictedSeed>opponentSeed;
+  }
+  const beforeUpset=uiRound2(winnerBase+exactBonus);
+  const calculated=uiRound2(upsetApplied?beforeUpset*1.5:beforeUpset);
+  const pts=Number(p.points_awarded||0);
+  return{
+    winnerHit,exact,upsetApplied,winnerBase,exactBonus,beforeUpset,calculated,pts,
+    matches:uiRound2(pts)===calculated,
+    label:!winnerHit?"× ハズレ":exact?"★ 完全的中":"✓ 勝者的中",
+    cls:!winnerHit?"result-miss":exact?"result-exact":"result-hit"
+  };
+}
+function seriesPointRule(s){
+  const q=state.config?.series_points?.[s.round]||{};
+  return `<div class="series-point-rule">
+    <span>配点</span>
+    <b>勝者 +${uiPoint(q.winner||0)}P</b>
+    <b>成績完全一致 +${uiPoint(q.exact||0)}P</b>
+    <em>UPSET ×1.5</em>
+  </div>`;
+}
+function seriesPointsBreakdown(s,p,result){
+  if(!result)return"";
+  const rows=[
+    `<div><span>勝者的中</span><b>+${uiPoint(result.winnerBase)}P</b></div>`,
+    result.exactBonus>0?`<div><span>シリーズ成績完全一致</span><b>+${uiPoint(result.exactBonus)}P</b></div>`:"",
+    result.upsetApplied?'<div><span>UPSET</span><b>×1.5</b></div>':""
+  ].filter(Boolean).join("");
+  const warning=result.matches?"":`<div class="points-breakdown-warning">採点正本は +${uiPoint(result.pts)}P です。表示内訳との不一致を検知したため、最終得点は採点正本を優先しています。</div>`;
+  return `<div class="series-result-block ${result.cls}">
+    <div class="prediction-result ${result.cls}"><div><span>${result.label}</span><small>${result.winnerHit?(result.exact?"勝者＋シリーズ成績完全一致":"勝者的中"):"勝者不的中"}</small></div><b>+${uiPoint(result.pts)}P</b></div>
+    <div class="points-breakdown ${result.matches?"":"has-warning"}">
+      <div class="points-breakdown-head"><span>シリーズ得点内訳</span><b>+${uiPoint(result.pts)}P</b></div>
+      <div class="points-breakdown-grid">${rows||'<div><span>獲得ポイント</span><b>0P</b></div>'}</div>
+      ${warning}
+    </div>
+  </div>`;
+}
 function seriesView(){
   const mine=state.seriesPredictions.filter(x=>x.actor_id===state.actor.id);
   const open=state.series.filter(s=>!isLocked(s.starts_at,s.status));
@@ -546,28 +598,34 @@ function seriesView(){
     const wb=!lb&&!pb?0:!lb&&pb?1:2;
     return wa-wb||new Date(a.starts_at)-new Date(b.starts_at);
   });
-  return viewTitle("シリーズ予想","未予想のシリーズを上に表示しています。")+
+  return viewTitle("シリーズ予想","未予想のシリーズを上に表示しています。配点と結果確定後の獲得内訳も確認できます。")+
   guideSteps(["勝者を選ぶ","最終成績を選ぶ","必要ならアップセットを選んで保存"])+
   (state.actor.role==="player"?`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>${predicted}</b></div><div class="status-count"><span>受付中</span><b>${open.length}</b></div></div>`:"")+
   ordered.map(s=>{
     const p=state.seriesPredictions.find(x=>x.series_id===s.id&&x.actor_id===state.actor.id),lock=isLocked(s.starts_at,s.status),need=s.round==="WCS"?2:s.round==="DS"?3:4;
+    const result=seriesPredictionResult(s,p);
     let cls="series-card",seriesPill=lock?'<span class="pill lock">締切</span>':'<span class="pill live">受付中</span>';
-    if(state.actor.role==="player"){
+    if(s.status==="final")seriesPill='<span class="pill final">シリーズ終了</span>';
+    else if(state.actor.role==="player"){
       if(p&&!lock){cls+=" series-predicted";seriesPill='<span class="pill predicted">✓ 予想済</span>'}
       else if(!p&&!lock){cls+=" series-unpredicted";seriesPill='<span class="pill pending">● 未予想</span>'}
       else if(!p&&lock){cls+=" series-missed";seriesPill='<span class="pill missed">未予想で締切</span>'}
     }
     return `<section class="card ${cls}"><div class="status-line"><div class="muted">${esc(roundName(s.round))}</div>${seriesPill}</div>
-      ${seriesTimingPanel(s.starts_at,s.status)}
+      ${s.status==="final"?`<div class="game-date-line">${jst(s.starts_at)}</div>`:seriesTimingPanel(s.starts_at,s.status)}
       ${matchupBlock(s.team_a,s.team_b)}
-      ${s.status==="final"?`<div class="notice">${esc(teamName(s.winner_team))} 勝利 · ${s.wins_a}-${s.wins_b}</div>`:""}
-      ${state.actor.role==="player"?`
+      ${seriesPointRule(s)}
+      ${s.status==="final"?`<div class="final-score"><span>SERIES FINAL</span><b>${esc(teamName(s.winner_team))} 勝利 · ${s.wins_a}-${s.wins_b}</b></div>`:""}
+      ${state.actor.role==="player"&&p&&s.status==="final"?`<div class="final-prediction"><span>あなたの予想</span><b>${esc(teamName(p.winner_team))} ／ ${p.winner_wins}-${p.loser_wins}${p.upset?" ／ UPSET":""}</b></div>`:""}
+      ${state.actor.role==="player"&&result?seriesPointsBreakdown(s,p,result):""}
+      ${state.actor.role==="player"&&s.status!=="final"?`
         <label class="label">シリーズ勝者</label><select id="sw_${s.id}" class="field" ${lock?"disabled":""}><option value="${esc(s.team_a)}" ${p?.winner_team===s.team_a?"selected":""}>${esc(teamName(s.team_a))}</option><option value="${esc(s.team_b)}" ${p?.winner_team===s.team_b?"selected":""}>${esc(teamName(s.team_b))}</option></select>
         <label class="label">シリーズ最終成績</label><select id="sl_${s.id}" class="field" ${lock?"disabled":""}>${Array.from({length:need},(_,n)=>`<option value="${n}" ${+p?.loser_wins===n?"selected":""}>${need}-${n}</option>`).join("")}</select>
         <div class="boost-row"><label><input id="su_${s.id}" type="checkbox" ${p?.upset?"checked":""} ${lock?"disabled":""}> アップセット予想</label><span class="tiny">下位シード勝利で×1.5</span></div>
         ${lock?"":`<button class="btn danger" style="width:100%" data-save-series="${s.id}">✓ シリーズ予想を保存</button>`}
-        ${p?`<div class="prediction-saved"><span>✓ シリーズ予想済み</span><b>${esc(teamName(p.winner_team))} ／ ${need}-${p.loser_wins}</b></div>`:(!lock?'<div class="prediction-needed">このシリーズはまだ予想していません</div>':"")}
+        ${p?`<div class="prediction-saved"><span>✓ シリーズ予想済み</span><b>${esc(teamName(p.winner_team))} ／ ${need}-${p.loser_wins}${p.upset?" ／ UPSET":""}</b></div>`:(!lock?'<div class="prediction-needed">このシリーズはまだ予想していません</div>':"")}
       `:""}
+      ${state.actor.role==="player"&&s.status==="final"&&!p?'<div class="locked-prediction no-entry"><span>あなたの予想</span><b>未予想</b></div>':""}
     </section>`
   }).join("");
 }
