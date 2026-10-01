@@ -1,7 +1,7 @@
 const API="https://lidgvyhsytwwfndsmeic.supabase.co/functions/v1/mlb-prediction";
 const app=document.getElementById("app");
 let token=localStorage.getItem("mlb_token")||"";
-let state=null,view="home",role="player",actorId="p1",busy=false,toastMessage="";
+let state=null,view="home",role="player",actorId="p1",busy=false,toastMessage="",gameSeriesFilter="all";
 
 const TEAM_NAMES={
   NYY:"ヤンキース",BOS:"レッドソックス",TOR:"ブルージェイズ",BAL:"オリオールズ",TB:"レイズ",
@@ -477,7 +477,30 @@ function gameCardMarkup(g,mine,now){
 function gamesView(){
   const mine=state.gamePredictions.filter(x=>x.actor_id===state.actor.id);
   const now=new Date(state.serverTime||Date.now());
-  const open=state.games.filter(g=>g.status==="scheduled"&&new Date(g.starts_at)>now);
+  if(gameSeriesFilter!=="all"&&!state.series.some(s=>s.id===gameSeriesFilter))gameSeriesFilter="all";
+  const statusRank={active:0,scheduled:1,final:2,cancelled:3};
+  const orderedSeries=[...state.series].sort((a,b)=>
+    (statusRank[a.status]??9)-(statusRank[b.status]??9)||
+    new Date(a.starts_at)-new Date(b.starts_at)
+  );
+  const seriesTabs=`<div class="series-tabs-wrap" aria-label="シリーズ切替">
+    <div class="series-tabs">
+      <button class="series-tab ${gameSeriesFilter==="all"?"active":""}" data-series-filter="all">
+        <span>全試合</span><em>${state.games.length}</em>
+      </button>
+      ${orderedSeries.map(s=>{
+        const count=state.games.filter(g=>g.series_id===s.id).length;
+        const attention=state.games.some(g=>g.series_id===s.id&&[0,1].includes(gameStatusBucket(g,now)));
+        return `<button class="series-tab ${gameSeriesFilter===s.id?"active":""} ${attention?"has-active":""}" data-series-filter="${s.id}">
+          <small>${esc(roundName(s.round))}</small>
+          <span>${esc(teamCode(s.team_a))}–${esc(teamCode(s.team_b))}</span>
+          <em>${count}</em>
+        </button>`;
+      }).join("")}
+    </div>
+  </div>`;
+  const visibleGames=gameSeriesFilter==="all"?state.games:state.games.filter(g=>g.series_id===gameSeriesFilter);
+  const open=visibleGames.filter(g=>g.status==="scheduled"&&new Date(g.starts_at)>now);
   const unpredicted=open.filter(g=>!mine.some(p=>p.game_id===g.id)).length;
   const predicted=open.length-unpredicted;
   const groups=[
@@ -487,17 +510,22 @@ function gamesView(){
     {bucket:[4],title:"終了済み",sub:"直近の試合から表示",cls:"finished-games"},
     {bucket:[5],title:"開催なし",sub:"シリーズ決着などで中止",cls:"cancelled-games"}
   ];
-  const ordered=[...state.games].sort((a,b)=>{
+  const ordered=[...visibleGames].sort((a,b)=>{
     const ba=gameStatusBucket(a,now),bb=gameStatusBucket(b,now);
     if(ba!==bb)return ba-bb;
     if(ba>=4)return new Date(b.starts_at)-new Date(a.starts_at);
     return new Date(a.starts_at)-new Date(b.starts_at);
   });
   const season=state.config?.season??2026;
-  let out=viewTitle("試合予想",`${season} POSTSEASON｜進行中を最上部、終了済みを下部に整理しています。`)+
+  let out=viewTitle("試合予想",`${season} POSTSEASON｜シリーズごとに切り替え、進行中を最上部に表示します。`)+
     guideSteps(["予想スコアを入力","上限内でPを配分","BOOSTを選んで保存"])+
+    seriesTabs+
     (state.actor.role==="player"?`<div class="status-summary"><div class="status-count pending"><span>未予想</span><b>${unpredicted}</b></div><div class="status-count done"><span>予想済み</span><b>${predicted}</b></div><div class="status-count"><span>受付中</span><b>${open.length}</b></div></div>`:"")+
     budgetCard();
+  if(!ordered.length){
+    out+='<div class="card empty-series-games">このシリーズには登録済みの試合がありません。</div>';
+    return out;
+  }
   for(const group of groups){
     const games=ordered.filter(g=>group.bucket.includes(gameStatusBucket(g,now)));
     if(!games.length)continue;
@@ -506,7 +534,6 @@ function gamesView(){
   }
   return out;
 }
-
 function seriesView(){
   const mine=state.seriesPredictions.filter(x=>x.actor_id===state.actor.id);
   const open=state.series.filter(s=>!isLocked(s.starts_at,s.status));
@@ -657,6 +684,7 @@ function render(){
   document.getElementById("logout").onclick=async()=>{try{await api("logout")}catch{}logoutLocal()};
   document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;render()});
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{view=b.dataset.go;render()});
+  document.querySelectorAll("[data-series-filter]").forEach(b=>b.onclick=()=>{gameSeriesFilter=b.dataset.seriesFilter||"all";render()});
   wireActions();
   const toast=document.getElementById("appToast");
   if(toast)setTimeout(()=>{toast.classList.add("hide");setTimeout(()=>{toastMessage=""},260)},2400);

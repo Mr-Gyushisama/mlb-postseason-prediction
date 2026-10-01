@@ -3691,3 +3691,26 @@ body:before{
   .final-prediction,.locked-prediction{align-items:flex-start;flex-direction:column;gap:2px}
   .final-prediction b,.locked-prediction b{text-align:left}
 }
+
+
+/* SERIES FILTER TABS v1 — 2026-10-01 */
+.series-tabs-wrap{margin:10px 0 12px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.series-tabs-wrap::-webkit-scrollbar{display:none}
+.series-tabs{display:flex;gap:7px;width:max-content;min-width:100%;padding:1px 2px 3px}
+.series-tab{position:relative;display:grid;grid-template-columns:auto auto;grid-template-areas:"small count" "name count";align-items:center;gap:0 8px;min-width:104px;min-height:50px;padding:7px 10px;border:1px solid #dce6ee;border-radius:13px;background:rgba(255,255,255,.88);color:#526c82;box-shadow:0 4px 14px rgba(28,64,92,.04);text-align:left;cursor:pointer;touch-action:manipulation}
+.series-tab small{grid-area:small;font-size:7px;line-height:1.15;color:#8a9aaa;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.series-tab span{grid-area:name;font-size:11px;line-height:1.2;font-weight:950;letter-spacing:.02em;color:#294961;white-space:nowrap}
+.series-tab em{grid-area:count;align-self:center;justify-self:end;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;border-radius:999px;background:#eef4f8;color:#75899a;font-size:8px;font-style:normal;font-weight:900}
+.series-tab.active{border-color:#8fc4e8;background:linear-gradient(180deg,#f0f8fe,#e7f3fc);box-shadow:0 7px 18px rgba(37,119,177,.10)}
+.series-tab.active span{color:#17699f}
+.series-tab.active em{background:#d6ebfa;color:#17699f}
+.series-tab.has-active:before{content:"";position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:#2ba0df;box-shadow:0 0 0 3px rgba(43,160,223,.10)}
+.series-tab.has-active em{margin-right:9px}
+.empty-series-games{padding:18px 14px;text-align:center;color:#7b8d9d;font-size:10px;font-weight:800}
+@media(max-width:560px){
+  .series-tabs-wrap{margin-left:-2px;margin-right:-2px}
+  .series-tabs{gap:6px;padding-left:1px;padding-right:8px}
+  .series-tab{min-width:96px;min-height:47px;padding:6px 9px;border-radius:12px}
+  .series-tab span{font-size:10.5px}
+  .series-tab small{font-size:6.8px}
+}
