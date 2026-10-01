@@ -1,7 +1,7 @@
 const API="https://lidgvyhsytwwfndsmeic.supabase.co/functions/v1/mlb-prediction";
 const app=document.getElementById("app");
 let token=localStorage.getItem("mlb_token")||"";
-let state=null,view="home",role="player",actorId="p1",busy=false,toastMessage="",gameSeriesFilter="all";
+let state=null,view="home",role="player",actorId="p1",busy=false,toastMessage="",gameSeriesFilter="all",playerDetailOpenId=null;
 
 const TEAM_NAMES={
   NYY:"ヤンキース",BOS:"レッドソックス",TOR:"ブルージェイズ",BAL:"オリオールズ",TB:"レイズ",
@@ -218,6 +218,7 @@ function shell(body){
     <main class="content">${body}</main>
     <nav class="nav glass-nav">${nav.map(([k,l,n])=>`<button data-view="${k}" class="${view===k?"active":""}"><span class="nav-icon">${uiIcon(k)}</span><span class="nav-label">${l}</span>${n? `<span class="nav-badge">${n>9?"9+":n}</span>`:""}</button>`).join("")}</nav>
     ${toastMessage?`<div id="appToast" class="app-toast" role="status"><span class="toast-check">✓</span><span>${esc(toastMessage)}</span></div>`:""}
+    ${playerDetailOpenId?playerDetailModal(playerDetailOpenId):""}
     <div id="busy" class="loading-overlay hidden"><div class="loading-box"><div class="spinner"></div><div class="muted" style="margin-top:8px">更新中...</div></div></div>
   </div>`;
 }
@@ -629,6 +630,129 @@ function seriesView(){
     </section>`
   }).join("");
 }
+function playerGameDetailRow(g,playerId){
+  const p=state.gamePredictions.find(x=>x.actor_id===playerId&&x.game_id===g.id);
+  const s=state.series.find(x=>x.id===g.series_id);
+  if(!p){
+    return `<div class="player-history-row no-prediction">
+      <div class="history-main"><small>${esc(roundName(s?.round))} 第${g.game_no}戦</small><b>${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</b></div>
+      <div class="history-pick"><span>予想</span><b>未予想</b></div>
+      <div class="history-points zero">0P</div>
+    </div>`;
+  }
+  const actualAway=Number(g.away_score),actualHome=Number(g.home_score);
+  const predAway=Number(p.away_score),predHome=Number(p.home_score);
+  const winnerHit=(actualAway>actualHome)===(predAway>predHome);
+  const exact=predAway===actualAway&&predHome===actualHome;
+  const oneSide=winnerHit&&!exact&&(predAway===actualAway||predHome===actualHome);
+  const resultLabel=exact?"完全的中":oneSide?"勝敗＋片側一致":winnerHit?"勝敗的中":"ハズレ";
+  const cls=exact?"exact":winnerHit?"hit":"miss";
+  return `<div class="player-history-row ${cls}">
+    <div class="history-main"><small>${esc(roundName(s?.round))} 第${g.game_no}戦</small><b>${esc(teamName(g.away_team))} ${g.away_score} - ${g.home_score} ${esc(teamName(g.home_team))}</b></div>
+    <div class="history-pick"><span>予想</span><b>${p.away_score} - ${p.home_score} ／ ${p.stake}P${p.boost?" ／ BOOST":""}</b><em>${resultLabel}</em></div>
+    <div class="history-points ${Number(p.points_awarded)>0?"earned":"zero"}">+${uiPoint(p.points_awarded||0)}P</div>
+  </div>`;
+}
+function playerSeriesDetailRow(s,playerId){
+  const p=state.seriesPredictions.find(x=>x.actor_id===playerId&&x.series_id===s.id);
+  const actualWinner=teamName(s.winner_team);
+  const actualScore=`${s.wins_a}-${s.wins_b}`;
+  if(!p){
+    return `<div class="player-history-row no-prediction">
+      <div class="history-main"><small>${esc(roundName(s.round))}</small><b>${esc(actualWinner)} 勝利 · ${actualScore}</b></div>
+      <div class="history-pick"><span>予想</span><b>未予想</b></div>
+      <div class="history-points zero">0P</div>
+    </div>`;
+  }
+  const result=seriesPredictionResult(s,p);
+  return `<div class="player-history-row ${result?.exact?"exact":result?.winnerHit?"hit":"miss"}">
+    <div class="history-main"><small>${esc(roundName(s.round))}</small><b>${esc(actualWinner)} 勝利 · ${actualScore}</b></div>
+    <div class="history-pick"><span>予想</span><b>${esc(teamName(p.winner_team))} ／ ${p.winner_wins}-${p.loser_wins}${p.upset?" ／ UPSET":""}</b><em>${result?.label||"確定"}</em></div>
+    <div class="history-points ${Number(p.points_awarded)>0?"earned":"zero"}">+${uiPoint(p.points_awarded||0)}P</div>
+  </div>`;
+}
+function confirmedPreDetail(playerId){
+  const p=state.prePredictions.find(x=>x.actor_id===playerId);
+  const c=state.config||{},q=c.pre_points||{};
+  const rows=[];
+  const push=(label,prediction,actual,hit,pts)=>{
+    rows.push(`<div class="player-pre-row ${hit?"hit":"miss"}"><div><span>${label}</span><b>${esc(prediction||"未予想")}</b><small>結果：${esc(actual)}</small></div><strong>${hit?"+":""}${uiPoint(hit?pts:0)}P</strong></div>`);
+  };
+  if(c.actual_al_champion){
+    push("AL優勝",p?teamName(p.al_champion):"未予想",teamName(c.actual_al_champion),!!p&&String(p.al_champion).toUpperCase()===String(c.actual_al_champion).toUpperCase(),Number(q.al||0));
+  }
+  if(c.actual_nl_champion){
+    push("NL優勝",p?teamName(p.nl_champion):"未予想",teamName(c.actual_nl_champion),!!p&&String(p.nl_champion).toUpperCase()===String(c.actual_nl_champion).toUpperCase(),Number(q.nl||0));
+  }
+  if(c.actual_al_champion&&c.actual_nl_champion){
+    const pred=p?`${teamName(p.al_champion)} × ${teamName(p.nl_champion)}`:"未予想";
+    const actual=`${teamName(c.actual_al_champion)} × ${teamName(c.actual_nl_champion)}`;
+    const hit=!!p&&String(p.al_champion).toUpperCase()===String(c.actual_al_champion).toUpperCase()&&String(p.nl_champion).toUpperCase()===String(c.actual_nl_champion).toUpperCase();
+    push("WS対戦カード",pred,actual,hit,Number(q.matchup||0));
+  }
+  if(c.actual_ws_champion){
+    push("WS優勝",p?teamName(p.ws_champion):"未予想",teamName(c.actual_ws_champion),!!p&&String(p.ws_champion).toUpperCase()===String(c.actual_ws_champion).toUpperCase(),Number(q.champion||0));
+  }
+  if(c.actual_ws_champion&&c.actual_ws_winner_wins!=null&&c.actual_ws_loser_wins!=null){
+    const pred=p?`${teamName(p.ws_champion)} ${p.ws_winner_wins}-${p.ws_loser_wins}`:"未予想";
+    const actual=`${teamName(c.actual_ws_champion)} ${c.actual_ws_winner_wins}-${c.actual_ws_loser_wins}`;
+    const hit=!!p&&String(p.ws_champion).toUpperCase()===String(c.actual_ws_champion).toUpperCase()&&Number(p.ws_winner_wins)===Number(c.actual_ws_winner_wins)&&Number(p.ws_loser_wins)===Number(c.actual_ws_loser_wins);
+    push("WS最終成績",pred,actual,hit,Number(q.exact||0));
+  }
+  if(!rows.length)return '<div class="player-detail-empty">大会前予想はまだ確定結果がありません。</div>';
+  return `<div class="player-pre-list">${rows.join("")}</div>`;
+}
+function playerDetailModal(playerId){
+  const rankIndex=state.ranking.findIndex(x=>x.player.id===playerId);
+  const x=state.ranking[rankIndex];
+  if(!x)return"";
+  const finalGames=[...state.games].filter(g=>g.status==="final").sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at));
+  const finalSeries=[...state.series].filter(s=>s.status==="final").sort((a,b)=>new Date(b.starts_at)-new Date(a.starts_at));
+  const predictedFinalGames=finalGames.filter(g=>state.gamePredictions.some(p=>p.actor_id===playerId&&p.game_id===g.id));
+  const wins=predictedFinalGames.filter(g=>{
+    const p=state.gamePredictions.find(v=>v.actor_id===playerId&&v.game_id===g.id);
+    return p&&((Number(p.away_score)>Number(p.home_score))===(Number(g.away_score)>Number(g.home_score)));
+  }).length;
+  const exact=predictedFinalGames.filter(g=>{
+    const p=state.gamePredictions.find(v=>v.actor_id===playerId&&v.game_id===g.id);
+    return p&&Number(p.away_score)===Number(g.away_score)&&Number(p.home_score)===Number(g.home_score);
+  }).length;
+  const losses=Math.max(predictedFinalGames.length-wins,0);
+  const rate=predictedFinalGames.length?Math.round(wins/predictedFinalGames.length*100):0;
+  return `<div class="player-detail-overlay" data-close-player-detail="backdrop" role="presentation">
+    <section class="player-detail-sheet" role="dialog" aria-modal="true" aria-label="${esc(x.player.display_name)}の確定実績">
+      <div class="player-detail-head">
+        <div><span>${rankIndex+1}位</span><h2>${esc(x.player.display_name)}</h2><small>確定済み実績のみ</small></div>
+        <button class="player-detail-close" data-close-player-detail="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="player-detail-summary">
+        <div><span>総合</span><b>${uiPoint(x.total)}P</b></div>
+        <div><span>試合</span><b>${uiPoint(x.game)}P</b></div>
+        <div><span>シリーズ</span><b>${uiPoint(x.series)}P</b></div>
+        <div><span>大会前</span><b>${uiPoint(x.pre)}P</b></div>
+      </div>
+      <div class="player-detail-stats">
+        <div><span>確定ベット</span><b>${predictedFinalGames.length}試合</b></div>
+        <div><span>勝敗</span><b>${wins}勝 ${losses}敗</b></div>
+        <div><span>的中率</span><b>${rate}%</b></div>
+        <div><span>完全的中</span><b>${exact}</b></div>
+      </div>
+      <div class="player-detail-section">
+        <div class="player-detail-title"><h3>終了済み試合</h3><span>${finalGames.length}</span></div>
+        ${finalGames.length?`<div class="player-history-list">${finalGames.map(g=>playerGameDetailRow(g,playerId)).join("")}</div>`:'<div class="player-detail-empty">終了済み試合はありません。</div>'}
+      </div>
+      <div class="player-detail-section">
+        <div class="player-detail-title"><h3>確定済みシリーズ</h3><span>${finalSeries.length}</span></div>
+        ${finalSeries.length?`<div class="player-history-list">${finalSeries.map(s=>playerSeriesDetailRow(s,playerId)).join("")}</div>`:'<div class="player-detail-empty">確定済みシリーズはありません。</div>'}
+      </div>
+      <div class="player-detail-section">
+        <div class="player-detail-title"><h3>大会前予想・確定分</h3></div>
+        ${confirmedPreDetail(playerId)}
+      </div>
+      <div class="player-detail-bottom"><button class="btn secondary" data-close-player-detail="button">閉じる</button></div>
+    </section>
+  </div>`;
+}
 function rankView(){
   const prePublic=state.config.pre_lock_at&&new Date(state.config.pre_lock_at)<=new Date(state.serverTime||Date.now());
   return viewTitle("順位表",prePublic?"順位・勝敗・各プレイヤーの優勝予想を確認できます。":"優勝予想は大会前予想の締切後に一斉公開されます。")+
@@ -648,12 +772,12 @@ function rankView(){
         <div class="rank-record"><span class="record-bet">ベット <strong>${x.betGames??0}</strong>試合</span><span class="record-win"><strong>${x.wins??0}</strong>勝</span><span class="record-loss"><strong>${x.losses??0}</strong>敗</span><span class="record-pending"><strong>${pendingGames}</strong>未決</span><span class="record-rate">的中率 ${x.settledGames?Math.round(((x.wins??0)/x.settledGames)*100):0}%</span></div>
         ${picks}
         <div class="rank-meta"><span>試合 ${x.game}P</span><span>シリーズ ${x.series}P</span><span>大会前 ${x.pre}P</span><span>残り配分 ${x.remaining}P</span></div>
+        <button class="rank-detail-link" data-player-detail="${x.player.id}">確定実績を見る <span>›</span></button>
       </div>
       <div class="rank-score">${x.total}P</div>
     </div>`;
   }).join("")}</div></section>`;
 }
-
 function postseasonFieldCard(){
   const teamRow=(code,league)=>`<div class="postseason-team"><span class="seed-no">${POSTSEASON_SEED[code]}</span><div><b>${esc(teamName(code))}</b><small>${league} ${POSTSEASON_SEED[code]<=2?"1回戦免除":"ワイルドカード"}</small></div></div>`;
   return `<section class="card postseason-field">
@@ -740,9 +864,12 @@ function render(){
   const body=view==="home"?homeView():view==="games"?gamesView():view==="series"?seriesView():view==="rank"?rankView():view==="pre"?preView():adminView();
   app.innerHTML=shell(body);
   document.getElementById("logout").onclick=async()=>{try{await api("logout")}catch{}logoutLocal()};
-  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{view=b.dataset.view;render()});
-  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{view=b.dataset.go;render()});
+  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{playerDetailOpenId=null;view=b.dataset.view;render()});
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{playerDetailOpenId=null;view=b.dataset.go;render()});
   document.querySelectorAll("[data-series-filter]").forEach(b=>b.onclick=()=>{gameSeriesFilter=b.dataset.seriesFilter||"all";render()});
+  document.querySelectorAll("[data-player-detail]").forEach(b=>b.onclick=e=>{e.stopPropagation();playerDetailOpenId=b.dataset.playerDetail;render()});
+  document.querySelectorAll("[data-close-player-detail]").forEach(b=>b.onclick=e=>{if(b.dataset.closePlayerDetail==="backdrop"&&e.target!==b)return;playerDetailOpenId=null;render()});
+  document.body.classList.toggle("player-detail-open",!!playerDetailOpenId);
   wireActions();
   const toast=document.getElementById("appToast");
   if(toast)setTimeout(()=>{toast.classList.add("hide");setTimeout(()=>{toastMessage=""},260)},2400);
