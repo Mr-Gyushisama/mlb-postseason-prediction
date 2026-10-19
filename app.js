@@ -211,6 +211,7 @@ function shell(body){
         <div class="header-brand"><div class="header-mark">MLB</div><div class="header-copy"><div class="eyebrow">POSTSEASON PREDICTION ${state.config?.season??2026}</div><h2>${esc(state.actor.display_name)}</h2></div></div>
         <div class="header-actions">
           ${pending.total?`<button class="header-notify" data-go="home" aria-label="未入力の予想が${pending.total}件あります">${uiIcon("bell")}<span class="notify-label">未対応</span><strong>${pending.total}</strong></button>`:`<div class="header-clear">✓ 入力済</div>`}
+          <button id="refreshState" class="btn ghost small">最新に更新</button>
           <button id="logout" class="btn ghost small">ログアウト</button>
         </div>
       </div>
@@ -863,9 +864,10 @@ function render(){
   if(state?.actor?.role==="player"&&state.actor.setup_required){renderSetup();return}
   const body=view==="home"?homeView():view==="games"?gamesView():view==="series"?seriesView():view==="rank"?rankView():view==="pre"?preView():adminView();
   app.innerHTML=shell(body);
+  document.getElementById("refreshState").onclick=()=>refresh();
   document.getElementById("logout").onclick=async()=>{try{await api("logout")}catch{}logoutLocal()};
-  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{playerDetailOpenId=null;view=b.dataset.view;render()});
-  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{playerDetailOpenId=null;view=b.dataset.go;render()});
+  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>{playerDetailOpenId=null;view=b.dataset.view;refresh()});
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{playerDetailOpenId=null;view=b.dataset.go;refresh()});
   document.querySelectorAll("[data-series-filter]").forEach(b=>b.onclick=()=>{gameSeriesFilter=b.dataset.seriesFilter||"all";render()});
   document.querySelectorAll("[data-player-detail]").forEach(b=>b.onclick=e=>{e.stopPropagation();playerDetailOpenId=b.dataset.playerDetail;render()});
   document.querySelectorAll("[data-close-player-detail]").forEach(b=>b.onclick=e=>{if(b.dataset.closePlayerDetail==="backdrop"&&e.target!==b)return;playerDetailOpenId=null;render()});
@@ -977,5 +979,7 @@ function wireActions(){
     mutate("adminUpsertGame",{id:val("gameId"),seriesId:val("gameSeriesId"),gameNo,awayTeam:val("gameAway"),homeTeam:val("gameHome"),startsAt,status:"scheduled"},"試合情報を保存しますか？");
   };
 }
+window.addEventListener("pageshow",e=>{if(e.persisted&&token&&!busy)refresh()});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&token&&!busy)refresh()});
 if(token)refresh();else renderLogin();
 setInterval(()=>{if(token&&!busy)refresh()},30000);
